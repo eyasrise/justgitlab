@@ -1,0 +1,58 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://118.25.60.227/master?useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT%2B8
+    username: root
+    password: 123
+
+
+  rabbitmq:
+    host: 118.25.60.227
+    port: 15672
+    username: admin
+    password: admin
+    publisher-confirms: true
+    connection-timeout:
+    virtual-host: my_vhost
+    listener:
+      simple:
+        concurrency: 5
+        max-concurrency: 15
+        acknowledge-mode: manual
+        prefetch: 1
+
+  redis:
+    database: 0
+    host: 148.70.121.147
+    port: 8803
+    password: eyasAdmin
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+    timeout: 200ms
+
+  application:
+    name: eyas-framework
+
+nacos:
+  discovery:
+    server-addr: 118.25.60.227:8848
+
+
+xxl:
+  job:
+    admin:
+      addresses: 118.25.60.227:8803/xxl-job-admin
+    executor:
+      appname: eyas-framework
+      ip: 118.25.60.227
+      port: 8999
+      logpath: /data/applogs/xxl-job/jobhandler
+      logretentiondays: -1
+      logconfig:
+    accessToken:
