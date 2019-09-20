@@ -51,15 +51,13 @@ public class JwtUtils {
          * @return
          */
         public static EyasFrameworkResult validateJWT(String jwtStr) {
-            EyasFrameworkResult checkResult = new EyasFrameworkResult();
             Claims claims = null;
             try {
                 claims = parseJWT(jwtStr);
-                EyasFrameworkResult.ok(claims);
+                return EyasFrameworkResult.ok(claims);
             } catch (Exception e) {
-                EyasFrameworkResult.fail(ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE.getErrCode(), ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE.getErrMsg());
+                return EyasFrameworkResult.fail(ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE.getErrCode(), ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE.getErrMsg());
             }
-            return checkResult;
         }
 
 
