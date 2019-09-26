@@ -27,6 +27,9 @@ public class EyasFrameworkBaseQuery implements Serializable {
      */
     private Integer totalRecord;
 
+    /**
+     * 排序字段
+     */
     private String sort;
 
     /**
