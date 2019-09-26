@@ -27,6 +27,8 @@ public class EyasFrameworkBaseQuery implements Serializable {
      */
     private Integer totalRecord;
 
+    private String sort;
+
     /**
      * 最大页面大小
      */

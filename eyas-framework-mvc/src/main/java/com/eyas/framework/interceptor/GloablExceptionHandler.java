@@ -1,6 +1,7 @@
 package com.eyas.framework.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
+import com.eyas.framework.data.EyasFrameworkResult;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,8 +18,7 @@ public class GloablExceptionHandler {
         if (msg == null || "".equals(msg)) {
             msg = "服务器出错";
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", msg);
-        return jsonObject;
+
+        return EyasFrameworkResult.ok(msg);
     }
 }
