@@ -2,6 +2,7 @@ package com.eyas.framework.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.eyas.framework.data.EyasFrameworkResult;
+import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -19,6 +20,6 @@ public class GloablExceptionHandler {
             msg = "服务器出错";
         }
 
-        return EyasFrameworkResult.ok(msg);
+        return EyasFrameworkResult.fail(ErrorFrameworkCodeEnum.LOGIN_ERROR.getErrCode(), msg);
     }
 }

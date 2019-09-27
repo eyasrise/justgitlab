@@ -36,6 +36,11 @@ public enum ErrorFrameworkCodeEnum {
      * JWT异常
      */
     JWT_ERRCODE_EXPIRE(ErrorCodeUtil.getErrorCode(SystemConstant.DOMAIN, ErrorCodeTypeEnum.BIZ.getCode(), ErrorCodeSourceEnum.INTERNAL.getCode(), "000006"), "JWT异常"),
+
+    /**
+     * 登录异常
+     */
+    LOGIN_ERROR(ErrorCodeUtil.getErrorCode(SystemConstant.DOMAIN, ErrorCodeTypeEnum.BIZ.getCode(), ErrorCodeSourceEnum.INTERNAL.getCode(), "000007"), "登录异常"),
     ;
 
 
