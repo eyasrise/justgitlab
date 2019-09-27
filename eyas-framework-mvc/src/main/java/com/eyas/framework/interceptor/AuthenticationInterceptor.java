@@ -3,6 +3,8 @@ package com.eyas.framework.interceptor;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.eyas.framework.JwtUtils;
 import com.eyas.framework.annotation.WithOutToken;
+import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
+import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import com.eyas.framework.impl.RedisServiceImpl;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,20 +49,20 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         //     if (userLoginToken.required()) {
                 // 执行认证
                 if (token == null) {
-                    throw new RuntimeException("无token，请重新登录");
+                    throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE,"无token，请重新登录");
                 }
                 // 获取 token 中的 user id
                 Claims claims;
                 try {
                     claims = JwtUtils.parseJWT(token);
                 } catch (JWTDecodeException j) {
-                    throw new RuntimeException("401");
+                    throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE,"无token，请重新登录");
                 }
                 // 获取用户id
                 String userId = claims.getId();
                 Object object1 = redisServiceImpl.get(userId);
                 if (object1 == null) {
-                    throw new RuntimeException("用户不存在，请重新登录");
+                    throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR, "用户不存在，请重新登录");
                 }
                 return true;
             // }

@@ -1,8 +1,10 @@
 package com.eyas.framework;
 
+import com.auth0.jwt.interfaces.Claim;
 import com.eyas.framework.constant.SystemConstant;
 import com.eyas.framework.data.EyasFrameworkResult;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
+import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import io.jsonwebtoken.*;
 import org.bouncycastle.util.encoders.Base64;
 
@@ -56,7 +58,7 @@ public class JwtUtils {
                 claims = parseJWT(jwtStr);
                 return EyasFrameworkResult.ok(claims);
             } catch (Exception e) {
-                return EyasFrameworkResult.fail(ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE.getErrCode(), ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE.getErrMsg());
+                throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE,"无token，请重新登录");
             }
         }
 
@@ -74,11 +76,18 @@ public class JwtUtils {
          * @return
          * @throws Exception
          */
-        public static Claims parseJWT(String jwt) throws Exception {
+        public static Claims parseJWT(String jwt) throws EyasFrameworkRuntimeException {
             SecretKey secretKey = generalKey();
-            return Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(jwt)
-                    .getBody();
+            Claims claim = null;
+            try {
+                claim = Jwts.parser()
+                        .setSigningKey(secretKey)
+                        .parseClaimsJws(jwt)
+                        .getBody();
+            }catch (Exception e){
+                throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR, e);
+            }
+
+            return claim;
         }
 }

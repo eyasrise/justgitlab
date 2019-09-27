@@ -3,6 +3,7 @@ package com.eyas.framework.interceptor;
 import com.alibaba.fastjson.JSONObject;
 import com.eyas.framework.data.EyasFrameworkResult;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
+import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,6 +21,16 @@ public class GloablExceptionHandler {
             msg = "服务器出错";
         }
 
-        return EyasFrameworkResult.fail(ErrorFrameworkCodeEnum.LOGIN_ERROR.getErrCode(), msg);
+        return EyasFrameworkResult.fail(ErrorFrameworkCodeEnum.SYSTEM_ERROR.getErrCode(), msg);
+    }
+
+    @ResponseBody
+    @ExceptionHandler(EyasFrameworkRuntimeException.class)
+    public Object handleException1(EyasFrameworkRuntimeException e) {
+        String msg = e.getMsg();
+        if (msg == null || "".equals(msg)) {
+            msg = "服务器出错";
+        }
+        return EyasFrameworkResult.fail(e.getCode(), e.getMsg());
     }
 }
