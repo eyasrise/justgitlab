@@ -5,6 +5,7 @@ import com.eyas.framework.JwtUtils;
 import com.eyas.framework.annotation.WithOutToken;
 import com.eyas.framework.impl.RedisServiceImpl;
 import io.jsonwebtoken.Claims;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Reference;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -19,7 +20,7 @@ import java.lang.reflect.Method;
  */
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
-    @Reference
+    @Autowired
     private RedisServiceImpl redisServiceImpl;
 
 
