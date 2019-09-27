@@ -57,8 +57,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 }
                 // 获取用户id
                 String userId = claims.getId();
-                String user = (String) redisServiceImpl.get(userId);
-                if (user == null) {
+                Object object1 = redisServiceImpl.get(userId);
+                if (object1 == null) {
                     throw new RuntimeException("用户不存在，请重新登录");
                 }
                 return true;
