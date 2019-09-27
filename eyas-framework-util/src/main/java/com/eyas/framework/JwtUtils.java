@@ -58,7 +58,7 @@ public class JwtUtils {
                 claims = parseJWT(jwtStr);
                 return EyasFrameworkResult.ok(claims);
             } catch (Exception e) {
-                throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE,"无token，请重新登录");
+                throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR,"无token，请重新登录");
             }
         }
 

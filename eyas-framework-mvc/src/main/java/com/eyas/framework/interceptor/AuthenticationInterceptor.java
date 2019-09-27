@@ -49,14 +49,14 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
         //     if (userLoginToken.required()) {
                 // 执行认证
                 if (token == null) {
-                    throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE,"无token，请重新登录");
+                    throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR,"无token，请重新登录");
                 }
                 // 获取 token 中的 user id
                 Claims claims;
                 try {
                     claims = JwtUtils.parseJWT(token);
                 } catch (JWTDecodeException j) {
-                    throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.JWT_ERRCODE_EXPIRE,"无token，请重新登录");
+                    throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR,"无token，请重新登录");
                 }
                 // 获取用户id
                 String userId = claims.getId();
