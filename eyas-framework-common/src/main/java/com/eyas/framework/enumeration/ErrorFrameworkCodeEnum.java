@@ -42,6 +42,9 @@ public enum ErrorFrameworkCodeEnum {
      */
     LOGIN_ERROR(ErrorCodeUtil.getErrorCode(SystemConstant.DOMAIN, ErrorCodeTypeEnum.BIZ.getCode(), ErrorCodeSourceEnum.INTERNAL.getCode(), "000007"), "登录异常"),
 
+    /**
+     * 系统异常
+     */
     SYSTEM_ERROR(ErrorCodeUtil.getErrorCode(SystemConstant.DOMAIN, ErrorCodeTypeEnum.BIZ.getCode(), ErrorCodeSourceEnum.INTERNAL.getCode(), "000008"), "系統异常"),
     ;
 
