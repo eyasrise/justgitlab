@@ -23,6 +23,13 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.1.9.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.1.9.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-tx:5.1.9.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.2.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.2.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.2.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-core:5.2.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.2.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.2.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-tx:5.2.0.RELEASE" level="project" />
     <orderEntry type="module" module-name="eyas-framework-common" />
     <orderEntry type="module" module-name="eyas-framework-util" />
     <orderEntry type="library" name="Maven: com.auth0:java-jwt:3.2.0" level="project" />

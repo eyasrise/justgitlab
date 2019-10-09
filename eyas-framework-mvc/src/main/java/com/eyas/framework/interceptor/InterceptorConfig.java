@@ -61,7 +61,7 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
                 //    Boolean字段如果为null,输出为false,而非null
                 SerializerFeature.WriteNullBooleanAsFalse,
                 //    Date的日期转换器
-                // SerializerFeature.WriteDateUseDateFormat,
+                SerializerFeature.WriteDateUseDateFormat,
                 //    循环引用
                 SerializerFeature.DisableCircularReferenceDetect
         );
