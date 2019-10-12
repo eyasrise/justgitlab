@@ -1,10 +1,13 @@
 package com.eyas.framework;
 
+import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
+import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
@@ -162,7 +165,12 @@ public class SnowflakeIdWorker {
     }
 
     private static Long getDataCenterId(){
-        int[] ints = StringUtils.toCodePoints(SystemUtils.getHostName());
+        int[] ints = new int[0];
+        try {
+            ints = StringUtils.toCodePoints(InetAddress.getLocalHost().getCanonicalHostName());
+        } catch (UnknownHostException e) {
+            throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "雪花算法获取IP有误");
+        }
         int sums = 0;
         for (int i: ints) {
             sums += i;
