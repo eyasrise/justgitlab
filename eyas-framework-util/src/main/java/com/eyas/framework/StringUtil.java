@@ -38,7 +38,7 @@ public class StringUtil {
         String checkMessage = "对不起，输入参数不能为空!";
         if (!EmptyUtil.checkEmpty(str, checkMessage) && !EmptyUtil.checkEmpty(splitRole, checkMessage) && !EmptyUtil.checkEmpty(isRemoveEmpty, checkMessage)) {
             if (ruleRangeList.contains(splitRole)) {
-                splitRole = "\"\\\\\"".trim() + splitRole;
+                splitRole = "\\".trim() + splitRole;
             }
             String[] splitStr;
             //字符串截取
