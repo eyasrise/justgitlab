@@ -5,7 +5,6 @@ import com.eyas.framework.DateUtil;
 import com.eyas.framework.JsonUtil;
 import com.eyas.framework.annotation.WithOutToken;
 import com.eyas.framework.data.EyasFrameworkResult;
-import com.eyas.framework.entity.UserEntity;
 import com.eyas.framework.entity.UserEntityQuery;
 import com.eyas.framework.service.intf.EyasFrameworkConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,17 +34,7 @@ public class OkController {
         return this.eyasFrameworkConfigService.getAreaConfigValue(key);
     }
 
-    @GetMapping("/testConverter")
-    @ResponseBody
-    public EyasFrameworkResult aa(){
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(1234567890123456712L);
-        userEntity.setCode("1212212");
-        userEntity.setCreateTime(new Date());
-        userEntity.setPayAmount(BigDecimalUtil.bigDecimalTransformation("12.21"));
-        userEntity.setEmail(DateUtil.getCurrentDateTime());
-        return EyasFrameworkResult.ok(userEntity);
-    }
+
     @GetMapping("/testPage")
     @ResponseBody
     public EyasFrameworkResult testPage(){
