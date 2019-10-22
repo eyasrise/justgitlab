@@ -34,8 +34,11 @@ public class ServiceAspect {
             Object[] var1 = joinPoint.getArgs();
             EyasRpcFeignEntity eyasRpcFeignEntity = (EyasRpcFeignEntity) var1[0];
             eyasRpcFeignEntity.setMethodName(methodName);
+            long start = System.currentTimeMillis();
             rstMsg = joinPoint.proceed(var1);
-            log.info("ServiceAspect:"+rstMsg);
+            long end = System.currentTimeMillis();
+            log.info("ServiceAspect:——"+rstMsg);
+            log.info("ServiceAspect:——" + "runTime--" + joinPoint + "\tUse time : " + (end - start) + " ms!");
         } catch (Throwable e) {
             e.printStackTrace();
         }
