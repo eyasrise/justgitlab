@@ -1,7 +1,5 @@
 package com.eyas.framework.controller;
 
-import com.eyas.framework.BigDecimalUtil;
-import com.eyas.framework.DateUtil;
 import com.eyas.framework.JsonUtil;
 import com.eyas.framework.annotation.WithOutToken;
 import com.eyas.framework.data.EyasFrameworkResult;
@@ -11,13 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 
 /**
  * @author Created by yixuan on 2019/7/8.
  */
-@Controller
-@RequestMapping("/api")
+@RestController
+@RequestMapping(value = "/api", produces = "text/plain;charset=UTF-8")
 public class OkController {
 
     @Autowired
