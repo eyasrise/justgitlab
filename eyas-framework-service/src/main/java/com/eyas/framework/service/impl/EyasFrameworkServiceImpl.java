@@ -99,7 +99,6 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
         return this.eyasFrameworkMiddle.update(d1);
     }
 
-
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer deleteById(Long id) {
@@ -192,4 +191,19 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
         // 再执行新增
         return this.insert(dto);
     }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer batchInsert(List<Dto> dtoList) {
+        final Integer[] count = {0};
+        if (EmptyUtil.isNotEmpty(dtoList) || EmptyUtil.isNotEmpty(dtoList.get(0))){
+            dtoList.stream().forEach(dto -> {
+                count[0] = count[0] + this.insert(dto);
+            });
+            return count[0];
+        }
+        return null;
+    }
+
 }

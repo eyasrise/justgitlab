@@ -121,4 +121,9 @@ public interface EyasFrameworkService<Dto, Q> {
      * @return
      */
     Integer updateById(Dto dto);
+
+    /**
+     *
+     */
+    Integer batchInsert(List<Dto> dtoList);
 }
