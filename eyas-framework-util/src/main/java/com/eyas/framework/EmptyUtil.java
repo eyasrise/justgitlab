@@ -112,6 +112,13 @@ public class EmptyUtil {
         }
     }
 
+    /**
+     * 对集合进行强制判断空，这个方法一旦校验，集合必定有值.
+     *
+     * @param tList 集合
+     * @param <T> 泛型
+     * @return Boolean
+     */
     public static <T> Boolean dealListForceEmpty(List<T> tList){
         if (EmptyUtil.isNotEmpty(tList) && EmptyUtil.isNotEmpty(tList.get(0))){
             return false;
@@ -120,6 +127,14 @@ public class EmptyUtil {
         }
     }
 
+    /**
+     * 对集合进行强制判断空，这个方法一旦校验，集合必定有值. 并抛出异常
+     *
+     * @param tList 集合
+     * @param errMsg 错误描述
+     * @param <T> 泛型
+     * @return List<T>
+     */
     public static <T> List<T> dealListForceEmptyDataReturn(List<T> tList, String errMsg){
         if (EmptyUtil.isNotEmpty(tList) && EmptyUtil.isNotEmpty(tList.get(0))){
             return tList;
