@@ -2,10 +2,13 @@ package com.eyas.framework;
 
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
+import com.eyas.framework.wxutils.DemoDto;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -107,6 +110,21 @@ public class EmptyUtil {
         }else{
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.UPDATE_DATA_FAIL, errMsg);
         }
+    }
+
+    public static <T> Boolean dealListForceEmpty(List<T> tList){
+        if (EmptyUtil.isNotEmpty(tList) && EmptyUtil.isNotEmpty(tList.get(0))){
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    public static <T> List<T> dealListForceEmptyDataReturn(List<T> tList, String errMsg){
+        if (EmptyUtil.isNotEmpty(tList) && EmptyUtil.isNotEmpty(tList.get(0))){
+            return tList;
+        }
+        throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.NULL_PARAM_ERROR, errMsg);
     }
 
 }
