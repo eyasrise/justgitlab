@@ -80,4 +80,9 @@ public class EyasFrameworkQuery extends EyasFrameworkBaseQuery implements Serial
      * 备用字段
      */
     private String extAtt;
+
+    /**
+     * 项目编码code
+     */
+    private Long projectCode;
 }

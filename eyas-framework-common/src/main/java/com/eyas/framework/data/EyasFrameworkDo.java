@@ -73,4 +73,9 @@ public class EyasFrameworkDo implements Serializable {
      */
     private String extAtt;
 
+    /**
+     * 项目编码code
+     */
+    private Long projectCode;
+
 }
