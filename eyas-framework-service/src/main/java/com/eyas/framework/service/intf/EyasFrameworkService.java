@@ -123,7 +123,10 @@ public interface EyasFrameworkService<Dto, Q> {
     Integer updateById(Dto dto);
 
     /**
+     * 批量新增数据
      *
+     * @param dtoList
+     * @return
      */
     Integer batchInsert(List<Dto> dtoList);
 }

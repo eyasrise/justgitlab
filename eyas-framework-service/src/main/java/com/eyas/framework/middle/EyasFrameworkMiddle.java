@@ -19,6 +19,11 @@ public class EyasFrameworkMiddle<D, Q> {
         return this.eyasFrameworkDao.insert(d);
     }
 
+    public Integer batchInsert(List<D> dList) {
+        return this.eyasFrameworkDao.batchInsert(dList);
+    }
+
+
     /**
      * 修改
      *

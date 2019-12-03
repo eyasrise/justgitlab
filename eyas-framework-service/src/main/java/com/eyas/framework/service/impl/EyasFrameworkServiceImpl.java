@@ -85,6 +85,17 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
 
     @Transactional(rollbackFor = Exception.class)
     @Override
+    public Integer batchInsert(List<Dto> dtoList){
+        List<D> dList = new ArrayList<>();
+        dtoList.stream().forEach(dto -> {
+            D d = this.dtoToD(dto);
+            dList.add(d);
+        });
+        return this.eyasFrameworkMiddle.batchInsert(dList);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
     public Integer update(Dto dto){
         D d = this.dtoToD(dto);
         return this.eyasFrameworkMiddle.updateNoLock(d);
@@ -190,20 +201,6 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
         this.eyasFrameworkMiddle.delete(d);
         // 再执行新增
         return this.insert(dto);
-    }
-
-
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public Integer batchInsert(List<Dto> dtoList) {
-        final Integer[] count = {0};
-        if (EmptyUtil.isNotEmpty(dtoList) || EmptyUtil.isNotEmpty(dtoList.get(0))){
-            dtoList.stream().forEach(dto -> {
-                count[0] = count[0] + this.insert(dto);
-            });
-            return count[0];
-        }
-        return null;
     }
 
 }

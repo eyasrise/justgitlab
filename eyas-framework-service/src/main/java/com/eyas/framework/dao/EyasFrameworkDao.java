@@ -19,6 +19,14 @@ public interface EyasFrameworkDao<D, Q> {
     Integer insert(D d);
 
     /**
+     * 批量新增
+     *
+     * @param dList
+     * @return
+     */
+    Integer batchInsert(List<D> dList);
+
+    /**
      * 修改
      *
      * @param d 对象do
