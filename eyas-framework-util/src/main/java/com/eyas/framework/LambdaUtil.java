@@ -98,7 +98,8 @@ public class LambdaUtil {
         lambdaUtilList.add(lambdaUtil);
         lambdaUtilList.add(lambdaUtil2);
         lambdaUtilList.add(lambdaUtil3);
-        System.out.println(LambdaUtil.sort10(lambdaUtilList, LambdaUtil::getAge));
+        List<LambdaUtil> lambdaUtilList1 = LambdaUtil.sort10(lambdaUtilList, LambdaUtil::getAge);
+        System.out.println(lambdaUtilList1);
         System.out.println(LambdaUtil.sort01(lambdaUtilList, LambdaUtil::getAge));
     }
 }
