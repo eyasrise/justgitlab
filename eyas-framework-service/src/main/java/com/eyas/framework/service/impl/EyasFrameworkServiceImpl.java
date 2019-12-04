@@ -127,6 +127,7 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
         return this.eyasFrameworkMiddle.deleteById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer delete(Dto dto){
         D d = this.dtoToD(dto);
