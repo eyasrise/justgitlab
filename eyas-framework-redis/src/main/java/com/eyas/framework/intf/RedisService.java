@@ -11,4 +11,11 @@ public interface RedisService {
 
     boolean set(String key, Object value);
 
+    /**
+     * 删除key
+     *
+     * @param key
+     */
+    void del(String... key);
+
 }
