@@ -1,6 +1,7 @@
 package com.eyas.framework.service.impl;
 
 import com.eyas.framework.EmptyUtil;
+import com.eyas.framework.ListUtil;
 import com.eyas.framework.StringUtil;
 import com.eyas.framework.data.EyasFrameworkBaseQuery;
 import com.eyas.framework.data.EyasFrameworkQuery;
@@ -91,7 +92,26 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
             D d = this.dtoToD(dto);
             dList.add(d);
         });
-        return this.eyasFrameworkMiddle.batchInsert(dList);
+        List<List<D>> ddList = ListUtil.splitList(dList, 500);
+        ddList.stream().forEach(ds -> {
+            this.eyasFrameworkMiddle.batchInsert(dList);
+        });
+        return 1;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer batchInsert(List<Dto> dtoList, Integer splitNumber){
+        List<D> dList = new ArrayList<>();
+        dtoList.stream().forEach(dto -> {
+            D d = this.dtoToD(dto);
+            dList.add(d);
+        });
+        List<List<D>> ddList = ListUtil.splitList(dList, splitNumber);
+        ddList.stream().forEach(ds -> {
+            this.eyasFrameworkMiddle.batchInsert(dList);
+        });
+        return 1;
     }
 
     @Transactional(rollbackFor = Exception.class)

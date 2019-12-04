@@ -17,6 +17,24 @@ public interface EyasFrameworkService<Dto, Q> {
      */
     Integer insert(Dto dto);
 
+
+    /**
+     * 批量新增数据-默认集合上限500
+     *
+     * @param dtoList
+     * @return
+     */
+    Integer batchInsert(List<Dto> dtoList);
+
+    /**
+     * 批量新增数据
+     *
+     * @param dtoList
+     * @param splitNumber-集合上限
+     * @return
+     */
+    Integer batchInsert(List<Dto> dtoList, Integer splitNumber);
+
     /**
      * 修改
      *
@@ -121,12 +139,4 @@ public interface EyasFrameworkService<Dto, Q> {
      * @return
      */
     Integer updateById(Dto dto);
-
-    /**
-     * 批量新增数据
-     *
-     * @param dtoList
-     * @return
-     */
-    Integer batchInsert(List<Dto> dtoList);
 }
