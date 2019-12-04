@@ -18,4 +18,6 @@ public interface RedisService {
      */
     void del(String... key);
 
+    void del(String key);
+
 }
