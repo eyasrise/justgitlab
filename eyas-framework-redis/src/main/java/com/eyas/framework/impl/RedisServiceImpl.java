@@ -85,6 +85,10 @@ public class RedisServiceImpl implements RedisService {
         }
     }
 
+    public void del(String key){
+        redisTemplate.delete(key);
+    }
+
 //============================String=============================
 
     /**
