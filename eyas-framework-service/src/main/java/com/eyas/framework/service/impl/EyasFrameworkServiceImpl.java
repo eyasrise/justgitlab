@@ -154,15 +154,7 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
         if (EmptyUtil.isNotEmpty(statusStr)){
             eyasFrameworkQuery.setStatusInt(StringUtil.stringSplit(statusStr, ","));
         }
-        List<D> dList = this.eyasFrameworkMiddle.query(q);
-        List<Dto> dtoList = new ArrayList<>();
-        for (D d:dList) {
-            Dto dto = this.dToDto(d);
-            dtoList.add(dto);
-        }
-        EyasFrameworkBaseQuery eyasFrameworkBaseQuery = (EyasFrameworkBaseQuery) q;
-        eyasFrameworkBaseQuery.setTotalRecord(this.queryCount(q));
-        return dtoList;
+        return this.query(q);
     }
 
     @Override
