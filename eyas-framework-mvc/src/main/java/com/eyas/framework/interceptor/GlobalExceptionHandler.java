@@ -17,7 +17,7 @@ import java.util.List;
  */
 @ControllerAdvice
 @Slf4j
-public class GloablExceptionHandler {
+public class GlobalExceptionHandler {
 
     @ResponseBody
     @ExceptionHandler(Exception.class)
