@@ -11,23 +11,23 @@ import java.util.List;
 public interface EyasFrameworkDao<D, Q> {
 
     /**
-     * 添加
+     * 单条添加数据
      *
      * @param d 对象do
-     * @return 1
+     * @return 成功:1 失败:0
      */
     Integer insert(D d);
 
     /**
-     * 批量新增
+     * 批量新增数据
      *
-     * @param dList
-     * @return
+     * @param dList 对象集合
+     * @return 新增条数
      */
     Integer batchInsert(List<D> dList);
 
     /**
-     * 修改
+     * 更新数据——带乐观锁
      *
      * @param d 对象do
      * @return 1
@@ -35,7 +35,7 @@ public interface EyasFrameworkDao<D, Q> {
     Integer update(D d);
 
     /**
-     * 修改
+     * 更新数据——不带乐观锁
      *
      * @param d 对象do
      * @return 1
@@ -43,7 +43,7 @@ public interface EyasFrameworkDao<D, Q> {
     Integer updateNoLock(D d);
 
     /**
-     * 删除
+     * 根据id删除数据——逻辑删除
      *
      * @param id 被删除对象id
      * @return 1
@@ -59,7 +59,7 @@ public interface EyasFrameworkDao<D, Q> {
     Integer delete(D d);
 
     /**
-     * 查询
+     * 查询-分页查询
      *
      * @param q 对象query
      * @return 对象组
