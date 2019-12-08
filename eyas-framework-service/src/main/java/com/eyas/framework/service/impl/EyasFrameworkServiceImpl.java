@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Created by yixuan on 2019/1/17.
@@ -99,10 +100,12 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
             dList.add(d);
         });
         List<List<D>> ddList = ListUtil.splitList(dList, splitNumber);
+        AtomicInteger cnt = new AtomicInteger();
+        cnt.set(0);
         ddList.stream().forEach(ds -> {
-            this.eyasFrameworkMiddle.batchInsert(dList);
+            cnt.set(cnt.get() + this.eyasFrameworkMiddle.batchInsert(dList));
         });
-        return 1;
+        return cnt.get();
     }
 
     @Transactional(rollbackFor = Exception.class)
