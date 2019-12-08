@@ -21,17 +21,17 @@ public interface EyasFrameworkService<Dto, Q> {
     /**
      * 批量新增数据-默认集合上限500
      *
-     * @param dtoList
-     * @return
+     * @param dtoList 对象集合
+     * @return 批量新增条数
      */
     Integer batchInsert(List<Dto> dtoList);
 
     /**
-     * 批量新增数据
+     * 批量新增数据——需要告知集合上限，一般最好低于1000
      *
-     * @param dtoList
+     * @param dtoList 对象集合
      * @param splitNumber-集合上限
-     * @return
+     * @return 批量新增条数
      */
     Integer batchInsert(List<Dto> dtoList, Integer splitNumber);
 
@@ -42,6 +42,22 @@ public interface EyasFrameworkService<Dto, Q> {
      * @return 1
      */
     Integer update(Dto dto);
+
+    /**
+     * 更新数据-带乐观锁
+     *
+     * @param dto
+     * @return
+     */
+    Integer updateById(Dto dto);
+
+    /**
+     * 批量更新
+     *
+     * @param dto 对象dto
+     * @return 更新记录数
+     */
+    Integer batchUpdate(Dto dto);
 
     /**
      * 删除
@@ -58,6 +74,23 @@ public interface EyasFrameworkService<Dto, Q> {
      * @return
      */
     Integer delete(Dto d);
+
+    /**
+     * 批量删除
+     *
+     * @param dto 对象dto
+     * @return 删除记录数
+     */
+    Integer batchDelete(Dto dto);
+
+    /**
+     * 更新数据-先删除再更新
+     * 复杂的逻辑可以先执行删除操作，再执行新增逻辑
+     *
+     * @param dto 对象dto
+     * @return 更新记录数
+     */
+    Integer updateByDelete(Dto dto);
 
     /**
      * 查询
@@ -84,31 +117,6 @@ public interface EyasFrameworkService<Dto, Q> {
     Integer queryCount(Q q);
 
     /**
-     * 批量更新
-     *
-     * @param dto 对象dto
-     * @return 更新记录数
-     */
-    Integer batchUpdate(Dto dto);
-
-    /**
-     * 批量删除
-     *
-     * @param dto 对象dto
-     * @return 删除记录数
-     */
-    Integer batchDelete(Dto dto);
-
-    /**
-     * 更新数据-先删除再更新
-     * 复杂的逻辑可以先执行删除操作，再执行新增逻辑
-     *
-     * @param dto 对象dto
-     * @return 更新记录数
-     */
-    Integer updateByDelete(Dto dto);
-
-    /**
      * 根据不同条件查询数据
      *
      * @param q q
@@ -131,12 +139,4 @@ public interface EyasFrameworkService<Dto, Q> {
      * @return dto
      */
     Dto getInfoById(Dto dto);
-
-    /**
-     * 更新数据-带乐观锁
-     *
-     * @param dto
-     * @return
-     */
-    Integer updateById(Dto dto);
 }
