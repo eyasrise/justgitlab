@@ -136,10 +136,10 @@ public class EmptyUtil {
      * @return List<T>
      */
     public static <T> List<T> dealListForceEmptyDataReturn(List<T> tList, String errMsg){
-        if (EmptyUtil.isNotEmpty(tList) && EmptyUtil.isNotEmpty(tList.get(0))){
-            return tList;
+        if (EmptyUtil.dealListForceEmpty(tList)){
+            throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.NULL_PARAM_ERROR, errMsg);
         }
-        throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.NULL_PARAM_ERROR, errMsg);
+        return tList;
     }
 
 }
