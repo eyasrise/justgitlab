@@ -12,7 +12,7 @@ public class SystemConstant {
 
     public static final String JWT_SECRET = "ZXlhcy1mcmFtZXdvcmstYmFzZQ==";
 
-    public static final Long JWT_TTL = 10000L;
+    public static final Long JWT_TTL = 3600000L;
 
 
 }
