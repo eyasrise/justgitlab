@@ -14,11 +14,6 @@ public class EyasFrameworkRuntimeException extends EyasRuntimeException{
         this.errorFrameworkCodeEnum = errCode;
     }
 
-    public EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum errCode, Integer msg) {
-        super(errCode.getErrCode(), "");
-        this.errorFrameworkCodeEnum = errCode;
-    }
-
     public EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum errCode, String msg) {
         super(errCode.getErrCode(), msg);
         this.errorFrameworkCodeEnum = errCode;
