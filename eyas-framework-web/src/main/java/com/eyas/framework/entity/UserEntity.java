@@ -1,6 +1,7 @@
 package com.eyas.framework.entity;
 
 import com.eyas.framework.data.EyasFrameworkDo;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -29,6 +30,7 @@ public class UserEntity extends EyasFrameworkDo {
     /**
      * email
      */
+    @ApiModelProperty(value = "email")
     private String email;
 
     /**
