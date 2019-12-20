@@ -11,6 +11,7 @@
     <artifactId>eyas-framework-common</artifactId>
 
     <dependencies>
+        <!--    增加swagger注解    -->
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
