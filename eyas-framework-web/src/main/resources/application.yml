@@ -38,6 +38,7 @@ spring:
 
   application:
     name: eyas-framework
+    simple: framework
 
 nacos:
   discovery:
