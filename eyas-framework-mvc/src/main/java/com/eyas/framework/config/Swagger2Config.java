@@ -30,9 +30,9 @@ public class Swagger2Config {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Spring Boot中使用Swagger2构建RESTful APIs")
-                .description("欢迎到我的GitHub：https://github.com/1610wang/")
-                .termsOfServiceUrl("https://github.com/1610wang/")
-                .contact("wxy")
+                .description("欢迎使用eyas架构")
+                .termsOfServiceUrl("")
+                .contact("eyas")
                 .version("1.0")
                 .build();
     }
