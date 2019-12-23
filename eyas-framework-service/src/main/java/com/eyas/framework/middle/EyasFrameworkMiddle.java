@@ -132,6 +132,6 @@ public class EyasFrameworkMiddle<D, Q> {
      * @return D
      */
     public D getInfoById(D d) {
-        return this.eyasFrameworkDao.getInfoById(d);
+        return this.eyasFrameworkDao.getInfoByDto(d);
     }
 }
