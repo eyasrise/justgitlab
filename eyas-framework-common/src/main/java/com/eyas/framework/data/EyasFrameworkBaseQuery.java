@@ -1,5 +1,6 @@
 package com.eyas.framework.data;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,23 +14,27 @@ public class EyasFrameworkBaseQuery implements Serializable {
     private static final long serialVersionUID = -7779110672848186411L;
 
     /**
-     * 页面数目
+     * 页面大小
      */
+    @ApiModelProperty(value = "页面大小")
     private Integer pageSize;
 
     /**
      * 当前页
      */
+    @ApiModelProperty(value = "当前页")
     private Integer currentPage;
 
     /**
      * 总数
      */
+    @ApiModelProperty(value = "总数")
     private Integer totalRecord;
 
     /**
      * 排序字段
      */
+    @ApiModelProperty(value = "排序字段")
     private String sort;
 
     /**
