@@ -112,5 +112,5 @@ public interface EyasFrameworkDao<D, Q> {
      * @param d d
      * @return D
      */
-    D getInfoByDto(D d);
+    D getInfoById(D d);
 }
