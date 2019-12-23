@@ -1,6 +1,7 @@
 package com.eyas.framework.data;
 
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -14,11 +15,13 @@ public class EyasFrameworkResult<T> implements Serializable {
     /**
      * 是否成功
      */
+    @ApiModelProperty(value = "是否成功:true-成功;false-失败")
     private boolean success;
 
     /**
      * 返回数据
      */
+    @ApiModelProperty(value = "通用接口返回数据")
     private T data;
 
     private EyasFrameworkBaseQuery eyasFrameworkBaseQuery;
@@ -26,11 +29,13 @@ public class EyasFrameworkResult<T> implements Serializable {
     /**
      * 错误码
      */
+    @ApiModelProperty(value = "错误码")
     private String errCode;
 
     /**
      * 错误信息
      */
+    @ApiModelProperty(value = "错误信息")
     private String errMsg;
 
     public static EyasFrameworkResult ok(){
