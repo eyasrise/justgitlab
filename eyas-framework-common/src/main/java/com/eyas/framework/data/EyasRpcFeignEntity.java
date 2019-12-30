@@ -1,4 +1,4 @@
-package com.eyas.framework.entity;
+package com.eyas.framework.data;
 
 import lombok.Data;
 

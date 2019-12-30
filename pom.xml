@@ -16,6 +16,7 @@
         <module>eyas-framework-mq</module>
         <module>eyas-framework-mvc</module>
         <module>eyas-framework-redis</module>
+        <module>eyas-framework-rpc</module>
         <module>eyas-framework-service</module>
         <module>eyas-framework-util</module>
         <module>eyas-framework-web</module>

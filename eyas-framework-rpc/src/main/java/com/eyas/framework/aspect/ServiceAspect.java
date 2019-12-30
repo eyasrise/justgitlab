@@ -1,6 +1,6 @@
 package com.eyas.framework.aspect;
 
-import com.eyas.framework.entity.EyasRpcFeignEntity;
+import com.eyas.framework.data.EyasRpcFeignEntity;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

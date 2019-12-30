@@ -1,7 +1,7 @@
 package com.eyas.framework.controller;
 
 import com.eyas.framework.JsonUtil;
-import com.eyas.framework.entity.EyasRpcFeignEntity;
+import com.eyas.framework.data.EyasRpcFeignEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestBody;
