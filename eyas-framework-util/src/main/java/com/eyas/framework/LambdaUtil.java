@@ -1,11 +1,11 @@
 package com.eyas.framework;
 
 import lombok.Data;
-import org.omg.CORBA.PRIVATE_MEMBER;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -26,12 +26,12 @@ public class LambdaUtil {
     /**
      * list去重算法
      *
-     * @param tList 去重集合
+     * @param tList        去重集合
      * @param keyExtractor 去重对象属性
-     * @param <T> 泛型
+     * @param <T>          泛型
      * @return
      */
-    public static <T> List<T> distinct(List<T> tList, Function<? super T, Object> keyExtractor){
+    public static <T> List<T> distinct(List<T> tList, Function<? super T, Object> keyExtractor) {
         //list是需要去重的list，返回值是去重后的list
         List<T> distinctTs = tList.stream().filter(distinctByKey(keyExtractor)).collect(Collectors.toList());
         return distinctTs;
@@ -44,7 +44,7 @@ public class LambdaUtil {
      * @param <T>   泛型
      * @return 分组的条件的值作为map的key，分组结果作为Value
      */
-    public static <T,E> Map<E, List<T>> groupByToMap(List<T> tList, Function<? super T, E> keyExtractor) {
+    public static <T, E> Map<E, List<T>> groupByToMap(List<T> tList, Function<? super T, E> keyExtractor) {
         return tList.stream().collect(Collectors.groupingBy(keyExtractor));
     }
 
@@ -56,13 +56,13 @@ public class LambdaUtil {
     /**
      * 排序工具——由小到大
      *
-     * @param tList 排序集合
+     * @param tList        排序集合
      * @param keyExtractor 排序字段
-     * @param <T> 忽略
-     * @param <U> 忽略
+     * @param <T>          忽略
+     * @param <U>          忽略
      * @return 排序结果
      */
-    public static <T, U extends Comparable<? super U>> List<T> sort01(List<T> tList, Function<? super T, ? extends U> keyExtractor){
+    public static <T, U extends Comparable<? super U>> List<T> sort01(List<T> tList, Function<? super T, ? extends U> keyExtractor) {
         //list是需要去重的list，返回值是去重后的list
         List<T> distinctTs = tList.stream().sorted(Comparator.comparing(keyExtractor)).collect(Collectors.toList());
         return distinctTs;
@@ -71,13 +71,13 @@ public class LambdaUtil {
     /**
      * 排序工具——由大到小
      *
-     * @param tList 排序集合
+     * @param tList        排序集合
      * @param keyExtractor 排序字段
-     * @param <T> 忽略
-     * @param <U> 忽略
+     * @param <T>          忽略
+     * @param <U>          忽略
      * @return 排序结果
      */
-    public static <T, U extends Comparable<? super U>> List<T> sort10(List<T> tList, Function<? super T, ? extends U> keyExtractor){
+    public static <T, U extends Comparable<? super U>> List<T> sort10(List<T> tList, Function<? super T, ? extends U> keyExtractor) {
         //list是需要去重的list，返回值是去重后的list
         List<T> distinctTs = tList.stream().sorted(Comparator.comparing(keyExtractor).reversed()).collect(Collectors.toList());
         return distinctTs;
