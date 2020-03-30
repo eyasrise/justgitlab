@@ -64,6 +64,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 if (object1 == null) {
                     throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR, "用户不存在，请重新登录");
                 }
+                //对token的过期时间进行判断，续期
+                Date expitation = claims.getExpiration();
+                if(expitation.getTime() - System.currentTimeMillis() < 60000){
+                    String newToken = JwtUtils.createJWT(userId, userId, SystemConstant.JWT_TTL);
+                    httpServletResponse.setHeader("token",newToken);
+                }
                 return true;
             // }
         }
