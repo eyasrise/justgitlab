@@ -1,6 +1,5 @@
 package com.eyas.framework;
 
-import com.auth0.jwt.interfaces.Claim;
 import com.eyas.framework.constant.SystemConstant;
 import com.eyas.framework.data.EyasFrameworkResult;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
