@@ -1,6 +1,6 @@
 package com.eyas.framework.enumeration;
 
-import com.eyas.framework.constant.SystemConstant;
+import com.eyas.framework.constsant.SystemConstant;
 
 public enum ErrorFrameworkCodeEnum {
     /**

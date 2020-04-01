@@ -38,18 +38,18 @@ public class EyasFrameworkResult<T> implements Serializable {
     @ApiModelProperty(value = "错误信息")
     private String errMsg;
 
-    public static EyasFrameworkResult ok(){
+    public static EyasFrameworkResult ok() {
         return ok(null);
     }
 
-    public static <T> EyasFrameworkResult ok(T data){
+    public static <T> EyasFrameworkResult<T> ok(T data) {
         EyasFrameworkResult<T> result = new EyasFrameworkResult<>();
         result.setData(data);
         result.setSuccess(true);
         return result;
     }
 
-    public static <T> EyasFrameworkResult ok(T data, EyasFrameworkBaseQuery eyasFrameworkBaseQuery){
+    public static <T> EyasFrameworkResult<T> ok(T data, EyasFrameworkBaseQuery eyasFrameworkBaseQuery) {
         EyasFrameworkResult<T> result = new EyasFrameworkResult<>();
         result.setData(data);
         result.setEyasFrameworkBaseQuery(eyasFrameworkBaseQuery);
@@ -57,22 +57,22 @@ public class EyasFrameworkResult<T> implements Serializable {
         return result;
     }
 
-    public static <T> EyasFrameworkResult okFrame(T data){
+    public static <T> EyasFrameworkResult<T> okFrame(T data) {
         EyasFrameworkResult<T> result = new EyasFrameworkResult<>();
         result.setData(data);
         result.setSuccess(true);
         return result;
     }
 
-    public static EyasFrameworkResult fail(String errCode, String errMsg){
-        EyasFrameworkResult result = new EyasFrameworkResult();
+    public static EyasFrameworkResult fail(String errCode, String errMsg) {
+        EyasFrameworkResult<?> result = new EyasFrameworkResult<>();
         result.setSuccess(false);
         result.setErrCode(errCode);
         result.setErrMsg(errMsg);
         return result;
     }
 
-    public static EyasFrameworkResult fail(EyasFrameworkRuntimeException e){
+    public static EyasFrameworkResult fail(EyasFrameworkRuntimeException e) {
         return fail(e.getCode(), e.getMsg());
     }
 }
