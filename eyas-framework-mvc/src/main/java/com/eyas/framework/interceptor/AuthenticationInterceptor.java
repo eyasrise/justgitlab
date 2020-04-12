@@ -9,6 +9,7 @@ import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import com.eyas.framework.impl.RedisServiceImpl;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,6 +22,7 @@ import java.util.Date;
 /**
  * @author Created by yixuan on 2019/7/11.
  */
+@Configuration
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Autowired
