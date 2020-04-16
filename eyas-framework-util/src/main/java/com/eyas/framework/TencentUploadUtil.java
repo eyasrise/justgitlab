@@ -62,11 +62,11 @@ public class TencentUploadUtil {
         }
     }
 
-    public static PutObjectResult uploadFile(File file){
+    public static PutObjectResult uploadFile(File file,String filePath){
         try {
             // 指定要上传到的存储桶
             String bucketName = "eyas-ips-1259584691";
-            String key = "images/"+file.getName();
+            String key = "images/"+filePath+"/"+file.getName();
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, file);
             PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
             return putObjectResult;
