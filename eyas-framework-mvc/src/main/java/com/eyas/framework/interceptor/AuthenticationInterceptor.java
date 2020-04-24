@@ -63,7 +63,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             }
             // 获取用户id
             String userId = claims.getId();
-            Object object1 = redisServiceImpl.get(userId);
+            Long tenantCode = Long.parseLong(claims.getSubject());
+            Object object1 = redisServiceImpl.get(userId+tenantCode);
             if (object1 == null) {
                 throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR, "用户不存在，请重新登录");
             }
