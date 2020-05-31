@@ -27,6 +27,7 @@ public class OkController {
     private UseTask useTask;
 
 
+
     @GetMapping("/ok")
     public String ok(){
         return "ok!";
@@ -52,23 +53,13 @@ public class OkController {
 
     @GetMapping("/redisLockTest")
     public void redisLockTest(){
-        try {
-
-            thread();
-
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void thread() throws ExecutionException, InterruptedException {
-        int j = 0;
         for (int i = 0; i < 10; i++) {
             useTask.aa(i);
         }
+            for (int i = 0; i < 10; i++) {
+                this.redisService.tryLock(i+"", 5000L, 5000L);
+                useTask.aa(i);
+            }
     }
-
 
 }
