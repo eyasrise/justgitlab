@@ -1,13 +1,16 @@
 package com.eyas.framework.controller;
 
 import com.eyas.framework.JsonUtil;
+import com.eyas.framework.config.UseTask;
 import com.eyas.framework.data.EyasFrameworkResult;
-import com.eyas.framework.entity.UserEntity;
 import com.eyas.framework.entity.UserEntityQuery;
+import com.eyas.framework.intf.RedisService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 
 /**
@@ -16,6 +19,12 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/hello")
 public class OkController {
+
+    @Autowired
+    private RedisService redisService;
+
+    @Autowired
+    private UseTask useTask;
 
 
     @GetMapping("/ok")
@@ -40,16 +49,26 @@ public class OkController {
     }
 
 
-    public static void main(String[] args) {
-        UserEntityQuery userEntityQuery = new UserEntityQuery();
-        userEntityQuery.setUserName("121221");
-        userEntityQuery.setTotalRecord(50);
-        userEntityQuery.setPageSize(10);
-        System.out.println(JsonUtil.toJson(userEntityQuery));
-        System.out.println(JsonUtil.toJson(userEntityQuery.getPageSize()));
-        System.out.println(JsonUtil.toJson(userEntityQuery.getCurrentPage()));
-        System.out.println(JsonUtil.toJson(userEntityQuery.getPageTotal()));
-        System.out.println("--"+JsonUtil.toJson(EyasFrameworkResult.ok(1212, userEntityQuery)));
+
+    @GetMapping("/redisLockTest")
+    public void redisLockTest(){
+        try {
+
+            thread();
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
+
+    public void thread() throws ExecutionException, InterruptedException {
+        int j = 0;
+        for (int i = 0; i < 10; i++) {
+            useTask.aa(i);
+        }
+    }
+
 
 }
