@@ -1,14 +1,21 @@
 package com.eyas.framework.impl;
 
+import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
+import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import com.eyas.framework.intf.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.types.Expiration;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -575,6 +582,41 @@ public class RedisServiceImpl implements RedisService {
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
+        }
+    }
+
+    public String tryLock(String key, Long tryMillis, Long expireMillis) {
+        RedisSerializer<String> keySerializer = this.redisTemplate.getKeySerializer();
+        RedisSerializer<String> valueSerializer = this.redisTemplate.getValueSerializer();
+        byte[] lockKey = keySerializer.serialize("RDS_LOCK_".concat(key));
+        byte[] lockValue = valueSerializer.serialize(UUID.randomUUID().toString());
+        Expiration expiration = Expiration.from(expireMillis, TimeUnit.MILLISECONDS);
+        RedisStringCommands.SetOption option = RedisStringCommands.SetOption.ifAbsent();
+        Long startMillis = System.currentTimeMillis();
+        int var12 = 0;
+
+        boolean isLock;
+        do {
+            if (var12++ > 0) {
+                try {
+                    Thread.sleep(2L);
+                } catch (InterruptedException var14) {
+                }
+            }
+
+            isLock = (Boolean)this.redisTemplate.execute((RedisCallback) (conn) -> {
+                try {
+                    return conn.set(lockKey, lockValue, expiration, option);
+                } catch (Exception var6) {
+                    throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, var6);
+                }
+            });
+        } while(!isLock && startMillis + tryMillis > System.currentTimeMillis());
+
+        if (isLock) {
+            return (String)valueSerializer.deserialize(lockValue);
+        } else {
+            throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR);
         }
     }
 
