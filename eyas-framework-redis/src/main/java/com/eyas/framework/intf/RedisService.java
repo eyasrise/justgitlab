@@ -13,4 +13,6 @@ public interface RedisService {
 
     void del(String key);
 
+    String tryLock(String key, Long tryMillis, Long expireMillis);
+
 }

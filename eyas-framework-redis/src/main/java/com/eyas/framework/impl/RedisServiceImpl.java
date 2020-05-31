@@ -585,6 +585,7 @@ public class RedisServiceImpl implements RedisService {
         }
     }
 
+    @Override
     public String tryLock(String key, Long tryMillis, Long expireMillis) {
         RedisSerializer<String> keySerializer = this.redisTemplate.getKeySerializer();
         RedisSerializer<String> valueSerializer = this.redisTemplate.getValueSerializer();
