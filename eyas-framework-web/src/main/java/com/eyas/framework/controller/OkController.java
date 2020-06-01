@@ -56,6 +56,11 @@ public class OkController {
         for (int i = 0; i < 10; i++) {
             this.redisService.tryLock(i+"", 2* 1000L, 3* 1000L);
             useTask.aa(i, Long.valueOf(delay));
+            try {
+                Thread.currentThread().sleep(Long.valueOf(delay));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

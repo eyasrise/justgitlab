@@ -20,12 +20,12 @@ public class UseTask {
 
     @Async
     public void aa(int i, Long delay){
-        try {
-            Thread.currentThread().sleep(delay);
+//        try {
+//            Thread.currentThread().sleep(delay);
             System.out.println("i=" + i);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
 
