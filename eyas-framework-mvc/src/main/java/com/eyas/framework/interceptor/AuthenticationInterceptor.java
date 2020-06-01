@@ -71,7 +71,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             //对token的过期时间进行判断，续期
             Date expiration = claims.getExpiration();
             if (expiration.getTime() - System.currentTimeMillis() < 1800_000) {
-                String newToken = JwtUtils.createJWT(userId, userId, SystemConstant.JWT_TTL);
+                String newToken = JwtUtils.createJWT(userId, tenantCode.toString(), SystemConstant.JWT_TTL);
                 httpServletResponse.setHeader("token", newToken);
             }
             return true;

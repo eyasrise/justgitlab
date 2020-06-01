@@ -62,11 +62,11 @@ public class TencentUploadUtil {
         }
     }
 
-    public static PutObjectResult uploadFile(File file,String filePath){
+    public static PutObjectResult uploadFile(File file,String filePath,String fileName){
         try {
             // 指定要上传到的存储桶
             String bucketName = "eyas-ips-1259584691";
-            String key = "images/"+filePath+"/"+file.getName();
+            String key = filePath+"/"+fileName;
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, file);
             PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
             return putObjectResult;
@@ -81,7 +81,6 @@ public class TencentUploadUtil {
     public static ObjectMetadata downloadFile(String key, String downloadPath){
         try{
             downloadPath = downloadPath + "\\" +key;
-            key = "images/" + key;
             // 指定对象所在的存储桶
             String bucketName = "eyas-ips-1259584691";
             // 指定要下载到的本地路径
@@ -101,7 +100,6 @@ public class TencentUploadUtil {
         try {
             // 指定对象所在的存储桶
             String bucketName = "eyas-ips-1259584691";
-            key = "images/" + key;
             cosClient.deleteObject(bucketName, key);
         } catch (CosServiceException serverException) {
             serverException.printStackTrace();
