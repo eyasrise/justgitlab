@@ -19,8 +19,14 @@ public class UseTask {
 
 
     @Async
-    public void aa(int i){
-        System.out.println("i=" + i);
+    public void aa(int i, Long delay){
+        try {
+            Thread.currentThread().sleep(1500);
+            System.out.println("i=" + i);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Async

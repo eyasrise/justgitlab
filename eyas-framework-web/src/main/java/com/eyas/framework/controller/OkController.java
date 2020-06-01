@@ -51,15 +51,12 @@ public class OkController {
 
 
 
-    @GetMapping("/redisLockTest")
-    public void redisLockTest(){
+    @GetMapping("/redisLockTest/{delay}")
+    public void redisLockTest(@PathVariable String delay){
         for (int i = 0; i < 10; i++) {
-            useTask.aa(i);
+            this.redisService.tryLock(i+"", 1* 1000L, 2* 1000L);
+            useTask.aa(i, Long.valueOf(delay));
         }
-            for (int i = 0; i < 10; i++) {
-                this.redisService.tryLock(i+"", 5000L, 5000L);
-                useTask.aa(i);
-            }
     }
 
 }
