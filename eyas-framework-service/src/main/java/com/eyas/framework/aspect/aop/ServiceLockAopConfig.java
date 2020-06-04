@@ -25,10 +25,10 @@ public class ServiceLockAopConfig {
 
     @Around("addAdvice()")
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
-        String logStr = "snt | plan | ServiceLockAopConfig |==";
+        String logStr = "snt-eyas-framework-ServiceLockAopConfig-";
         // 设置锁
         String className = this.getClass().getSimpleName();
-        String key = "SNT-PLAN-SERVICE:SYNC:" + className;
+        String key = "EYAS-FRAMEWORK-SERVICE:SYNC:" + className;
         String lockKey = "";
         Object result;
         try {
