@@ -33,7 +33,7 @@ public class ServiceLockAopConfig {
         Object result;
         try {
             // 加锁开始
-            // 加锁的实效是时间是一分钟——强制job必须在一分钟执行完，其他的10s旋转等待
+            // 加锁的实效是时间是一分钟——强制服务必须在一分钟执行完，其他的10s旋转等待
             log.info(logStr + key);
             lockKey = this.redisService.tryLock(key, 10* 1000L, 60* 1000L);
             log.info(logStr + lockKey);
