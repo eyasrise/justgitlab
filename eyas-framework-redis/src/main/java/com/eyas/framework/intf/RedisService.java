@@ -15,4 +15,6 @@ public interface RedisService {
 
     String tryLock(String key, Long tryMillis, Long expireMillis);
 
+    void releaseLock(String key, String value);
+
 }
