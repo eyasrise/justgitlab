@@ -42,12 +42,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.eyas</groupId>
-            <artifactId>eyas-framework-redis</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
             <version>1.9.2</version>
