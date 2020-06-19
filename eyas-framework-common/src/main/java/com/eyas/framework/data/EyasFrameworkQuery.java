@@ -87,7 +87,7 @@ public class EyasFrameworkQuery extends EyasFrameworkBaseQuery implements Serial
      * id多值
      */
     @ApiModelProperty(value = "id多值")
-    private List<String> ids;
+    private List<Long> ids;
 
     /**
      * status多值
