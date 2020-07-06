@@ -19,7 +19,7 @@ public class ServiceLockAopConfig {
     private RedisService redisService;
 
 
-    @Pointcut("execution(public * com.eyas.framework.service.impl.*.*(..)) && @annotation(com.eyas.framework.aspect.config.ServiceLockService)" )
+    @Pointcut("execution(public * com.eyas.*.service.impl.*.*(..)) && @annotation(com.eyas.framework.aspect.config.ServiceLockService)" )
     public void addAdvice(){}
 
 
