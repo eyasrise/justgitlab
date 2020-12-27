@@ -30,7 +30,7 @@ public class OkController {
 
     @GetMapping("/ok")
     public String ok(){
-        return "ok!";
+        return "ok11!";
     }
 
 //    @GetMapping("config/{key}")
