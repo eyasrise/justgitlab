@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.eyas</groupId>
     <artifactId>eyas-framework-web</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>eyas-framework-web</name>
     <description>Demo project for Spring Boot</description>
 
@@ -43,37 +43,37 @@
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-service</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-config</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-job</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-mq</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-redis</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-mvc</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
