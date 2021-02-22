@@ -20,6 +20,9 @@ import java.io.StringReader;
 import java.sql.Connection;
 import java.util.Properties;
 
+/**
+ * @author Created by eyas on 2021/2/22.
+ */
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
 @Slf4j
 @Component
@@ -50,6 +53,8 @@ public class MySqlInterceptor implements Interceptor {
                 plain.setWhere(whereExpression);
             }
         } else {
+            // 判断plain.getJoins()是否为空，用来判定是不是联表查询，因为联表查询比较复杂，所有直接忽略联表查询
+            // 链表查询自己写租户关联逻辑
             if (whereSql.length() > 0 && EmptyUtil.isEmpty(plain.getJoins())) {
                 //where条件之前存在，需要重新进行拼接
                 whereSql.append(" and ( ").append(where.toString()).append(" )");
