@@ -3,6 +3,7 @@ package com.eyas.framework.interceptor;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.eyas.framework.JwtUtils;
 import com.eyas.framework.annotation.WithOutToken;
+import com.eyas.framework.utils.TenantThreadLocal;
 import com.eyas.framework.constant.SystemConstant;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
@@ -74,6 +75,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 String newToken = JwtUtils.createJWT(userId, tenantCode.toString(), SystemConstant.JWT_TTL);
                 httpServletResponse.setHeader("token", newToken);
             }
+            TenantThreadLocal.setSystemUser(object1);
             return true;
             // }
         }

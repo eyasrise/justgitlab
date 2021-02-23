@@ -2,6 +2,8 @@ package com.eyas.framework.config;
 
 
 import com.eyas.framework.EmptyUtil;
+import com.eyas.framework.data.EyasFrameworkDto;
+import com.eyas.framework.utils.TenantThreadLocal;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
@@ -41,8 +43,16 @@ public class MySqlInterceptor implements Interceptor {
         CCJSqlParserManager parserManager = new CCJSqlParserManager();
         Select select = (Select) parserManager.parse(new StringReader(sql));
         PlainSelect plain = (PlainSelect) select.getSelectBody();
+        EyasFrameworkDto systemUser = (EyasFrameworkDto) TenantThreadLocal.getSystemUser();
+
+
+        if (systemUser !=null){
+            whereSql.append("TENANT_CODE =");
+            whereSql.append(systemUser.getTenantCode());
+        }
+
         //--todo--需要获取动态租户code的逻辑--
-        whereSql.append("TENANT_CODE =100");
+
         // 获取当前查询条件
         Expression where = plain.getWhere();
         if (where == null) {
