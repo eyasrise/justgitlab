@@ -11,7 +11,7 @@ import com.eyas.framework.interceptor.UserInfo;
 public interface UserProvider {
 
     /**
-     * 如果返回不为null 则代码有用户
+     * 如果返回不为null 则代表有用户
      * 建议尽量填充{@link UserInfo}属性
      * 例如:
      * {@link UserInfo#setUserId(String)}
