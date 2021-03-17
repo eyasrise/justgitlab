@@ -8,13 +8,13 @@ package com.eyas.framework.utils;
 public class TenantThreadLocal {
 
     //创建本地线程变量
-   private static ThreadLocal threadLocal = new InheritableThreadLocal<>();
+    private static final ThreadLocal<Object> threadLocal = new InheritableThreadLocal<>();
 
-   public static Object getSystemUser(){
-       return threadLocal.get();
-   }
+    public static Object getSystemUser() {
+        return threadLocal.get();
+    }
 
-   public static void setSystemUser(Object t){
-       threadLocal.set(t);
-   }
+    public static void setSystemUser(Object t) {
+        threadLocal.set(t);
+    }
 }
