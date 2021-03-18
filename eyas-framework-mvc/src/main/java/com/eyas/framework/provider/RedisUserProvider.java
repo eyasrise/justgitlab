@@ -4,8 +4,10 @@ import com.eyas.framework.interceptor.TokenInfo;
 import com.eyas.framework.interceptor.UserInfo;
 import com.eyas.framework.intf.RedisService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
+@Component
 public class RedisUserProvider implements UserProvider {
 
     private final RedisService redisService;
