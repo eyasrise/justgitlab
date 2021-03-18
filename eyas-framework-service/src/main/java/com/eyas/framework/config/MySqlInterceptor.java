@@ -16,7 +16,6 @@ import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
-import org.springframework.stereotype.Component;
 
 import java.io.StringReader;
 import java.sql.Connection;
@@ -27,7 +26,6 @@ import java.util.Properties;
  */
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
 @Slf4j
-@Component
 public class MySqlInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
