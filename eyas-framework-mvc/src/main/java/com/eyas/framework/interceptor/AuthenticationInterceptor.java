@@ -79,6 +79,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             Long tenantCode = Long.parseLong(claims.getSubject());
             TokenInfo tokenInfo = TokenInfo.builder().tenantCode(tenantCode).build();
             UserInfo userInfo = userProvider.getUserInfo(userId, tokenInfo);
+
             if (userInfo == null) {
                 throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR, "用户不存在，请重新登录");
             }
