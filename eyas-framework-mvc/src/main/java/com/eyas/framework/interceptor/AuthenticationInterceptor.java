@@ -6,10 +6,15 @@ import com.eyas.framework.annotation.WithOutToken;
 import com.eyas.framework.constant.SystemConstant;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
+import com.eyas.framework.intf.RedisService;
+import com.eyas.framework.provider.RedisUserProvider;
 import com.eyas.framework.provider.UserProvider;
 import com.eyas.framework.utils.TenantThreadLocal;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -28,6 +33,13 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Autowired
     private UserProvider userProvider;
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean(RedisService.class)
+    public UserProvider userProvider(RedisService redisService) {
+        return new RedisUserProvider(redisService);
+    }
 
 
     @Override
