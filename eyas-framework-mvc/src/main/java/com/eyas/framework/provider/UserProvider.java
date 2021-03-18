@@ -1,7 +1,7 @@
 package com.eyas.framework.provider;
 
-import com.eyas.framework.interceptor.TokenInfo;
-import com.eyas.framework.interceptor.UserInfo;
+import com.eyas.framework.data.TokenInfo;
+import com.eyas.framework.data.UserInfo;
 
 /**
  * 获取用户信息的提供者

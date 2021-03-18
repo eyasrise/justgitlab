@@ -1,4 +1,4 @@
-package com.eyas.framework.interceptor;
+package com.eyas.framework.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
