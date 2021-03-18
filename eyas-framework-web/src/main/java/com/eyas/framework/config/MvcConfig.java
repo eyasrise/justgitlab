@@ -1,6 +1,6 @@
 package com.eyas.framework.config;
 
-import com.eyas.framework.data.UserInfo;
+import com.eyas.framework.data.EyasFrameworkUserInfo;
 import com.eyas.framework.interceptor.AuthenticationInterceptor;
 import com.eyas.framework.intf.DatabaseService;
 import com.eyas.framework.provider.UserProvider;
@@ -20,7 +20,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Bean
     public UserProvider userProvider(){
-        return (userId, tokenInfo) -> UserInfo.builder().userId("XS1212").userCode("1212").tenantCode(100L).systemUser(null).build();
+        return (userId, tokenInfo) -> EyasFrameworkUserInfo.builder().userId("XS1212").userCode("1212").tenantCode(100L).systemUser(null).build();
     }
 
     @Bean

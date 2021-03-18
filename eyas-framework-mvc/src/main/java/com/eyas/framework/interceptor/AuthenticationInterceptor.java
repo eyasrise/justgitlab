@@ -4,8 +4,8 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.eyas.framework.JwtUtils;
 import com.eyas.framework.annotation.WithOutToken;
 import com.eyas.framework.constant.SystemConstant;
-import com.eyas.framework.data.TokenInfo;
-import com.eyas.framework.data.UserInfo;
+import com.eyas.framework.data.EyasFrameworkTokenInfo;
+import com.eyas.framework.data.EyasFrameworkUserInfo;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import com.eyas.framework.intf.RedisService;
@@ -79,10 +79,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             // 获取用户id
             String userId = claims.getId();
             Long tenantCode = Long.parseLong(claims.getSubject());
-            TokenInfo tokenInfo = TokenInfo.builder().tenantCode(tenantCode).build();
-            UserInfo userInfo = userProvider.getUserInfo(userId, tokenInfo);
+            EyasFrameworkTokenInfo eyasFrameworkTokenInfo = EyasFrameworkTokenInfo.builder().tenantCode(tenantCode).build();
+            EyasFrameworkUserInfo eyasFrameworkUserInfo = userProvider.getUserInfo(userId, eyasFrameworkTokenInfo);
 
-            if (userInfo == null) {
+            if (eyasFrameworkUserInfo == null) {
                 throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR, "用户不存在，请重新登录");
             }
             //对token的过期时间进行判断，续期
@@ -91,7 +91,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 String newToken = JwtUtils.createJWT(userId, tenantCode.toString(), SystemConstant.JWT_TTL);
                 httpServletResponse.setHeader("token", newToken);
             }
-            TenantThreadLocal.setSystemUser(userInfo.getSystemUser());
+            TenantThreadLocal.setSystemUser(eyasFrameworkUserInfo.getSystemUser());
             return true;
             // }
         }

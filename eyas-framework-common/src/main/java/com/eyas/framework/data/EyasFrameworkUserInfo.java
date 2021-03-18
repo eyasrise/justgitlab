@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserInfo {
+public class EyasFrameworkUserInfo {
 
     /**
      * 暂同userCode

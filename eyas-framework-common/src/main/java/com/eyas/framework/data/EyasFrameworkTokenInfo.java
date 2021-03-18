@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenInfo {
+public class EyasFrameworkTokenInfo {
 
     private String userName;
 
