@@ -18,9 +18,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Bean
     UserProvider userProvider(){
-        return (userId, tokenInfo) -> {
-            return UserInfo.builder().userId("XS1212").userCode("1212").tenantCode(100L).systemUser(null).build();
-        };
+        return (userId, tokenInfo) -> UserInfo.builder().userId("XS1212").userCode("1212").tenantCode(100L).systemUser(null).build();
     }
 
     @Override
