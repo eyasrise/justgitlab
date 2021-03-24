@@ -1,6 +1,5 @@
 package com.eyas.framework.config;
 
-
 import com.eyas.framework.EmptyUtil;
 import com.eyas.framework.data.EyasFrameworkDto;
 import com.eyas.framework.utils.TenantThreadLocal;
@@ -92,7 +91,12 @@ public class MySqlInterceptor implements Interceptor {
         }
         if (statements.getStatements().get(0) instanceof Insert){
             EyasFrameworkDto systemUser = (EyasFrameworkDto) TenantThreadLocal.getSystemUser();
+            if(EmptyUtil.isEmpty(systemUser)){
+                return invocation.proceed();
+            }
+
             Long tenantCode = systemUser.getTenantCode();
+
             Insert insert = (Insert) parserManager.parse(new StringReader(sql));
 
             insert.getColumns().add(new Column("TENANT_CODE"));
@@ -105,7 +109,7 @@ public class MySqlInterceptor implements Interceptor {
                 }
             }
 
-           // PlainSelect plain = (PlainSelect) insert.getSelect().getSelectBody();
+            // PlainSelect plain = (PlainSelect) insert.getSelect().getSelectBody();
 
 
 
@@ -114,10 +118,10 @@ public class MySqlInterceptor implements Interceptor {
 //                    .parseCondExpression(whereSql.toString());
 //            plain.setWhere(expression);
 
-            return null;
+            return invocation.proceed();
         } else {
             //返回原始sql
-            return sql;
+            return invocation.proceed();
 
         }
 
