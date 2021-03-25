@@ -83,7 +83,6 @@ public class MySqlInterceptor implements Interceptor {
 
             metaObject.setValue("delegate.boundSql.sql", select.toString());
             log.info("新sql===>" + select.toString());
-            return invocation.proceed();
         } else if (statements.getStatements().get(0) instanceof Insert) {
             EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
             if (EmptyUtil.isEmpty(systemUser)) {
@@ -130,11 +129,13 @@ public class MySqlInterceptor implements Interceptor {
                 List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
                 parameterMappingList.remove(parameterMappingList.get(index2.get()));
                 metaObject.setValue("delegate.boundSql.sql", insert.toString());
-                return invocation.proceed();
+                log.info("新sql===>" + insert.toString());
             }
+            return invocation.proceed();
         } else {
             return invocation.proceed();
         }
+        return invocation.proceed();
     }
 
     public Object plugin(Object o) {
