@@ -5,10 +5,8 @@ import com.eyas.framework.data.EyasFrameworkDto;
 import com.eyas.framework.utils.TenantThreadLocal;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.ItemsList;
-import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
@@ -19,6 +17,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
@@ -28,7 +27,9 @@ import java.io.StringReader;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 /**
  * @author Created by eyas on 2021/2/22.
@@ -36,9 +37,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
 @Slf4j
 public class MySqlInterceptor implements Interceptor {
-
-    public MySqlInterceptor() {
-    }
 
     public Object intercept(Invocation invocation) throws Throwable {
         StatementHandler statementHandler = (StatementHandler)invocation.getTarget();
@@ -93,18 +91,45 @@ public class MySqlInterceptor implements Interceptor {
             } else {
                 Long tenantCode = systemUser.getTenantCode();
                 Insert insert = (Insert)parserManager.parse(new StringReader(sql));
-                insert.getColumns().add(new Column("TENANT_CODE"));
-                if (insert.getItemsList() != null) {
-                    ItemsList itemsList = insert.getItemsList();
-                    if (itemsList instanceof MultiExpressionList) {
-                        ((MultiExpressionList)itemsList).getExprList().forEach((dto) -> {
-                            dto.getExpressions().add(new LongValue(tenantCode));
-                        });
-                    } else {
-                        ((ExpressionList)insert.getItemsList()).getExpressions().add(new LongValue(tenantCode));
+                List<Column> columnList = insert.getColumns();
+                AtomicBoolean flag = new AtomicBoolean(false);
+                columnList.forEach(column -> {
+                    if (column.toString().equals("TENANT_CODE")){
+                        flag.set(true);
                     }
+                });
+                if (!flag.get()) {
+//                    insert.getColumns().add(new Column("TENANT_CODE"));
+//                    if (insert.getItemsList() != null) {
+//                        ItemsList itemsList = insert.getItemsList();
+//                        if (itemsList instanceof MultiExpressionList) {
+//                            ((MultiExpressionList)itemsList).getExprList().forEach((dto) -> {
+//                                dto.getExpressions().add(new LongValue(tenantCode));
+//                            });
+//                        } else {
+//                            ((ExpressionList)insert.getItemsList()).getExpressions().add(new LongValue(tenantCode));
+//                        }
+//                    }
+                    return invocation.proceed();
+                }else{
+                    AtomicReference<Integer> index= new AtomicReference<>(0);
+                    // 获取下标
+                    Stream.iterate(0, i -> i + 1).limit(columnList.size()).forEach(i -> {
+                        if (columnList.get(i).toString().equals("TENANT_CODE")){
+                            index.set(i);
+                        }
+                    });
+                    ((ExpressionList)insert.getItemsList()).getExpressions().set(index.get(), new StringValue(String.valueOf(tenantCode)));
                 }
-
+                AtomicReference<Integer> index2= new AtomicReference<>(0);
+                Stream.iterate(0, i -> i + 1).limit(boundSql.getParameterMappings().size()).forEach(i -> {
+                    if (boundSql.getParameterMappings().get(i).toString().contains("tenantCode")){
+                        index2.set(i);
+                    }
+                });
+                List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+                parameterMappingList.remove(parameterMappingList.get(index2.get()));
+                metaObject.setValue("delegate.boundSql.sql", insert.toString());
                 return invocation.proceed();
             }
         } else {
