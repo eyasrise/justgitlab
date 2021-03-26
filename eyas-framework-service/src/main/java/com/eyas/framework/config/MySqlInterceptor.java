@@ -15,6 +15,7 @@ import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.statement.update.Update;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -57,6 +58,8 @@ public class MySqlInterceptor implements Interceptor {
             return this.processSelect((Select) statement);
         }else if (statement instanceof Insert){
             return this.processInsert((Insert) statement, boundSql);
+        }else if (statement instanceof Update){
+            return this.processUpdate((Update) statement, boundSql);
         }
         return boundSql.getSql();
     }
@@ -131,6 +134,47 @@ public class MySqlInterceptor implements Interceptor {
             }
         }
         return boundSql.getSql();
+    }
+
+    public String processUpdate(Update update, BoundSql boundSql) throws Throwable{
+        EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
+        
+        if (EmptyUtil.isNotEmpty(systemUser)){
+            Long tenantCode = systemUser.getTenantCode();
+            List<Column> columnList = update.getColumns();
+            AtomicBoolean flag = new AtomicBoolean(false);
+            columnList.forEach(column -> {
+                if (column.toString().equals("TENANT_CODE")){
+                    flag.set(true);
+                }
+            });
+            if (flag.get()) {
+                // 如果包含TENANT_CODE直接赋值
+                Expression where = update.getWhere();
+                Expression expression;
+                StringBuffer whereSql = new StringBuffer();
+                whereSql.append("TENANT_CODE =");
+                whereSql.append(tenantCode);
+                if (where == null) {
+                    if (whereSql.length() > 0) {
+
+                    }
+                } else {
+                    if (whereSql.length() > 0 && EmptyUtil.isEmpty(update.getJoins())) {
+                        whereSql.append(" and ( ").append(where.toString()).append(" )");
+                    } else {
+                        whereSql = new StringBuffer();
+                        whereSql.append(where.toString());
+                    }
+                    expression = CCJSqlParserUtil.parseCondExpression(whereSql.toString());
+                    update.setWhere(expression);
+                }
+            }
+        }
+
+
+
+        return update.toString();
     }
 
 
