@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
@@ -25,6 +26,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -109,32 +111,43 @@ public class MySqlInterceptor implements Interceptor {
             List<Column> columnList = insert.getColumns();
             AtomicBoolean flag = new AtomicBoolean(false);
             columnList.forEach(column -> {
-                if (column.toString().equals("TENANT_CODE")){
+                if ("TENANT_CODE".equals(column.toString())){
                     flag.set(true);
                 }
             });
             if (flag.get()) {
-                final AtomicReference<Integer> index2 = new AtomicReference(0);
-                Stream.iterate(0, (i) -> {
-                    return i + 1;
-                }).limit((long)columnList.size()).forEach((i) -> {
-                    if (((Column)columnList.get(i)).toString().equals("TENANT_CODE")) {
-                        index2.set(i);
+                // 获取租户code坐标
+                int index = 0;
+                for (int i=0;i<columnList.size();i++){
+                    if ("TENANT_CODE".equals(columnList.get(i).toString())){
+                        index = i;
                     }
-
-                });
-                ((ExpressionList)insert.getItemsList()).getExpressions().set((Integer)index2.get(), new StringValue(String.valueOf(tenantCode)));
-                index2.set(0);
-                Stream.iterate(0, (i) -> {
-                    return i + 1;
-                }).limit((long)boundSql.getParameterMappings().size()).forEach((i) -> {
-                    if (((ParameterMapping)boundSql.getParameterMappings().get(i)).toString().contains("tenantCode")) {
-                        index2.set(i);
+                }
+                // 单条数据跟批量数据不一样
+                // 给指定坐标index的租户code赋值
+                if (insert.getItemsList() instanceof ExpressionList){
+                    ExpressionList expressionList = (ExpressionList)insert.getItemsList();
+                    expressionList.getExpressions().set(index, new StringValue(String.valueOf(tenantCode)));
+                    //
+                }else if(insert.getItemsList() instanceof MultiExpressionList){
+                    MultiExpressionList multiExpressionList = (MultiExpressionList) insert.getItemsList();
+                    for (ExpressionList expression:
+                            multiExpressionList.getExprList()) {
+                        expression.getExpressions().set(index, new StringValue(String.valueOf(tenantCode)));
                     }
-
-                });
+                }
+                // 移除问号影响
                 List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
-                parameterMappingList.remove(parameterMappingList.get((Integer)index2.get()));
+                List<ParameterMapping> parameterMappingList1 = new ArrayList<>();
+
+                for (int i=0;i<boundSql.getParameterMappings().size();i++){
+                    if (boundSql.getParameterMappings().get(i).toString().contains("tenantCode")){
+                        parameterMappingList1.add(parameterMappingList.get(i));
+                    }
+                }
+                if (!EmptyUtil.dealListForceEmpty(parameterMappingList1)) {
+                    parameterMappingList.removeAll(parameterMappingList1);
+                }
                 return insert.toString();
             }
         }
