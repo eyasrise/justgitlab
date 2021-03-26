@@ -111,7 +111,7 @@ public class MySqlInterceptor implements Interceptor {
                 }
             });
             if (flag.get()) {
-                final AtomicReference<Integer> index2 = new AtomicReference(0);
+                AtomicReference<Integer> index2 = new AtomicReference(0);
                 Stream.iterate(0, (i) -> {
                     return i + 1;
                 }).limit((long)columnList.size()).forEach((i) -> {
