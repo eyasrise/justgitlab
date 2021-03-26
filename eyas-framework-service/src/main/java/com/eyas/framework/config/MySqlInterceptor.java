@@ -85,9 +85,7 @@ public class MySqlInterceptor implements Interceptor {
             log.info("新sql===>" + select.toString());
         } else if (statements.getStatements().get(0) instanceof Insert) {
             EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
-            if (EmptyUtil.isEmpty(systemUser)) {
-                return invocation.proceed();
-            } else {
+            if (EmptyUtil.isNotEmpty(systemUser)) {
                 Long tenantCode = systemUser.getTenantCode();
                 Insert insert = (Insert)parserManager.parse(new StringReader(sql));
                 List<Column> columnList = insert.getColumns();
