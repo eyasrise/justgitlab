@@ -111,22 +111,27 @@ public class MySqlInterceptor implements Interceptor {
                 }
             });
             if (flag.get()) {
-                AtomicReference<Integer> index= new AtomicReference<>(0);
-                // 获取下标
-                Stream.iterate(0, i -> i + 1).limit(columnList.size()).forEach(i -> {
-                    if (columnList.get(i).toString().equals("TENANT_CODE")){
-                        index.set(i);
-                    }
-                });
-                ((ExpressionList)insert.getItemsList()).getExpressions().set(index.get(), new StringValue(String.valueOf(tenantCode)));
-                AtomicReference<Integer> index2= new AtomicReference<>(0);
-                Stream.iterate(0, i -> i + 1).limit(boundSql.getParameterMappings().size()).forEach(i -> {
-                    if (boundSql.getParameterMappings().get(i).toString().contains("tenantCode")){
+                final AtomicReference<Integer> index2 = new AtomicReference(0);
+                Stream.iterate(0, (i) -> {
+                    return i + 1;
+                }).limit((long)columnList.size()).forEach((i) -> {
+                    if (((Column)columnList.get(i)).toString().equals("TENANT_CODE")) {
                         index2.set(i);
                     }
+
+                });
+                ((ExpressionList)insert.getItemsList()).getExpressions().set((Integer)index2.get(), new StringValue(String.valueOf(tenantCode)));
+                index2.set(0);
+                Stream.iterate(0, (i) -> {
+                    return i + 1;
+                }).limit((long)boundSql.getParameterMappings().size()).forEach((i) -> {
+                    if (((ParameterMapping)boundSql.getParameterMappings().get(i)).toString().contains("tenantCode")) {
+                        index2.set(i);
+                    }
+
                 });
                 List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
-                parameterMappingList.remove(parameterMappingList.get(index2.get()));
+                parameterMappingList.remove(parameterMappingList.get((Integer)index2.get()));
                 return insert.toString();
             }
         }
