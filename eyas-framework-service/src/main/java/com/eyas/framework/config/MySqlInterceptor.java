@@ -59,7 +59,7 @@ public class MySqlInterceptor implements Interceptor {
         }else if (statement instanceof Insert){
             return this.processInsert((Insert) statement, boundSql);
         }else if (statement instanceof Update){
-            return this.processUpdate((Update) statement, boundSql);
+//            return this.processUpdate((Update) statement, boundSql);
         }
         return boundSql.getSql();
     }
@@ -138,7 +138,7 @@ public class MySqlInterceptor implements Interceptor {
 
     public String processUpdate(Update update, BoundSql boundSql) throws Throwable{
         EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
-        
+
         if (EmptyUtil.isNotEmpty(systemUser)){
             Long tenantCode = systemUser.getTenantCode();
             List<Column> columnList = update.getColumns();
