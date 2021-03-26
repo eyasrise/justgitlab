@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
@@ -24,6 +25,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -116,16 +118,29 @@ public class MySqlInterceptor implements Interceptor {
                         index = i;
                     }
                 }
-                ((ExpressionList)insert.getItemsList()).getExpressions().set(index, new StringValue(String.valueOf(tenantCode)));
-                Integer index2 = null;
-                for (int i=0;i<boundSql.getParameterMappings().size();i++){
-                    if (boundSql.getParameterMappings().get(i).toString().contains("tenantCode")){
-                        index2 = i;
+
+                //单条数据跟批量数据不一样
+                if (insert.getItemsList() instanceof ExpressionList){
+                    ExpressionList expressionList = (ExpressionList)insert.getItemsList();
+                    expressionList.getExpressions().set(index, new StringValue(String.valueOf(tenantCode)));
+                    //
+                }else if(insert.getItemsList() instanceof MultiExpressionList){
+                    MultiExpressionList multiExpressionList = (MultiExpressionList) insert.getItemsList();
+                    for (ExpressionList expression:
+                            multiExpressionList.getExprList()) {
+                        expression.getExpressions().set(index, new StringValue(String.valueOf(tenantCode)));
                     }
                 }
-                if (EmptyUtil.isNotEmpty(index2)) {
-                    List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
-                    parameterMappingList.remove(parameterMappingList.get(index2));
+                List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+                List<ParameterMapping> parameterMappingList1 = new ArrayList<>();
+
+                for (int i=0;i<boundSql.getParameterMappings().size();i++){
+                    if (boundSql.getParameterMappings().get(i).toString().contains("tenantCode")){
+                        parameterMappingList1.add(parameterMappingList.get(i));
+                    }
+                }
+                if (!EmptyUtil.dealListForceEmpty(parameterMappingList1)) {
+                    parameterMappingList.removeAll(parameterMappingList1);
                 }
                 return insert.toString();
             }
