@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
 
 /**
  * @author Created by eyas on 2021/2/22.
@@ -111,27 +110,23 @@ public class MySqlInterceptor implements Interceptor {
                 }
             });
             if (flag.get()) {
-                AtomicReference<Integer> index2 = new AtomicReference(0);
-                Stream.iterate(0, (i) -> {
-                    return i + 1;
-                }).limit((long)columnList.size()).forEach((i) -> {
-                    if (((Column)columnList.get(i)).toString().equals("TENANT_CODE")) {
-                        index2.set(i);
+                int index = 0;
+                for (int i=0;i<columnList.size();i++){
+                    if (columnList.get(i).toString().equals("TENANT_CODE")){
+                        index = i;
                     }
-
-                });
-                ((ExpressionList)insert.getItemsList()).getExpressions().set((Integer)index2.get(), new StringValue(String.valueOf(tenantCode)));
-                index2.set(0);
-                Stream.iterate(0, (i) -> {
-                    return i + 1;
-                }).limit((long)boundSql.getParameterMappings().size()).forEach((i) -> {
-                    if (((ParameterMapping)boundSql.getParameterMappings().get(i)).toString().contains("tenantCode")) {
-                        index2.set(i);
+                }
+                ((ExpressionList)insert.getItemsList()).getExpressions().set(index, new StringValue(String.valueOf(tenantCode)));
+                Integer index2 = null;
+                for (int i=0;i<boundSql.getParameterMappings().size();i++){
+                    if (boundSql.getParameterMappings().get(i).toString().contains("tenantCode")){
+                        index2 = i;
                     }
-
-                });
-                List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
-                parameterMappingList.remove(parameterMappingList.get((Integer)index2.get()));
+                }
+                if (EmptyUtil.isNotEmpty(index2)) {
+                    List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+                    parameterMappingList.remove(parameterMappingList.get(index2));
+                }
                 return insert.toString();
             }
         }
