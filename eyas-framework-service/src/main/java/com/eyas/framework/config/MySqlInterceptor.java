@@ -113,14 +113,15 @@ public class MySqlInterceptor implements Interceptor {
                 }
             });
             if (flag.get()) {
+                // 获取租户code坐标
                 int index = 0;
                 for (int i=0;i<columnList.size();i++){
                     if ("TENANT_CODE".equals(columnList.get(i).toString())){
                         index = i;
                     }
                 }
-
-                //单条数据跟批量数据不一样
+                // 单条数据跟批量数据不一样
+                // 给指定坐标index的租户code赋值
                 if (insert.getItemsList() instanceof ExpressionList){
                     ExpressionList expressionList = (ExpressionList)insert.getItemsList();
                     expressionList.getExpressions().set(index, new StringValue(String.valueOf(tenantCode)));
@@ -132,6 +133,7 @@ public class MySqlInterceptor implements Interceptor {
                         expression.getExpressions().set(index, new StringValue(String.valueOf(tenantCode)));
                     }
                 }
+                // 移除问号影响
                 List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
                 List<ParameterMapping> parameterMappingList1 = new ArrayList<>();
 
