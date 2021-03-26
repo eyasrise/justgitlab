@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class MySqlInterceptor implements Interceptor {
 
+    @Override
     public Object intercept(Invocation invocation) throws Throwable {
         StatementHandler statementHandler = (StatementHandler)invocation.getTarget();
         MetaObject metaObject = MetaObject.forObject(statementHandler, SystemMetaObject.DEFAULT_OBJECT_FACTORY, SystemMetaObject.DEFAULT_OBJECT_WRAPPER_FACTORY, new DefaultReflectorFactory());
@@ -69,7 +70,7 @@ public class MySqlInterceptor implements Interceptor {
         List<SelectItem> selectItemList = plain.getSelectItems();
         AtomicReference<Boolean> flag = new AtomicReference<>(false);
         selectItemList.stream().forEach(selectItem -> {
-            if (selectItem.toString().equals("TENANT_CODE")){
+            if ("TENANT_CODE".equals(selectItem.toString())){
                 flag.set(true);
             }
         });
@@ -107,14 +108,14 @@ public class MySqlInterceptor implements Interceptor {
             List<Column> columnList = insert.getColumns();
             AtomicBoolean flag = new AtomicBoolean(false);
             columnList.forEach(column -> {
-                if (column.toString().equals("TENANT_CODE")){
+                if ("TENANT_CODE".equals(column.toString())){
                     flag.set(true);
                 }
             });
             if (flag.get()) {
                 int index = 0;
                 for (int i=0;i<columnList.size();i++){
-                    if (columnList.get(i).toString().equals("TENANT_CODE")){
+                    if ("TENANT_CODE".equals(columnList.get(i).toString())){
                         index = i;
                     }
                 }
@@ -150,10 +151,12 @@ public class MySqlInterceptor implements Interceptor {
 
 
 
+    @Override
     public Object plugin(Object o) {
         return Plugin.wrap(o, this);
     }
 
+    @Override
     public void setProperties(Properties properties) {
     }
 }
