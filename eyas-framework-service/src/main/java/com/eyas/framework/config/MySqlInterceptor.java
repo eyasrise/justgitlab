@@ -7,9 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.PlainSelect;
@@ -23,7 +23,6 @@ import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
-import java.io.StringReader;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Properties;
@@ -43,85 +42,98 @@ public class MySqlInterceptor implements Interceptor {
         MetaObject metaObject = MetaObject.forObject(statementHandler, SystemMetaObject.DEFAULT_OBJECT_FACTORY, SystemMetaObject.DEFAULT_OBJECT_WRAPPER_FACTORY, new DefaultReflectorFactory());
         BoundSql boundSql = statementHandler.getBoundSql();
         String sql = boundSql.getSql();
-        StringBuffer whereSql = new StringBuffer();
-        CCJSqlParserManager parserManager = new CCJSqlParserManager();
         Statements statements = CCJSqlParserUtil.parseStatements(sql);
-        if (statements.getStatements().get(0) instanceof Select) {
-            Select select = (Select)parserManager.parse(new StringReader(sql));
-            PlainSelect plain = (PlainSelect)select.getSelectBody();
-            EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
-            List<SelectItem> selectItemList = plain.getSelectItems();
-            AtomicReference<Boolean> flag = new AtomicReference<>(false);
-            selectItemList.stream().forEach(selectItem -> {
-                if (selectItem.toString().equals("TENANT_CODE")){
-                    flag.set(true);
-                }
-            });
-            if (systemUser != null && flag.get()) {
-                whereSql.append("TENANT_CODE =");
-                whereSql.append(systemUser.getTenantCode());
+        EmptyUtil.dealEmptyDataReturn(statements.getStatements(), "mysql插件异常，statements.getStatements()为空");
+        EmptyUtil.dealEmptyDataReturn(statements.getStatements().get(0), "mysql插件异常，statements.getStatements().get(0)为空");
+        Statement statement = statements.getStatements().get(0);
+        String newSql = this.rooter(statement, boundSql);
+        log.info("新sql===>" + newSql);
+        metaObject.setValue("delegate.boundSql.sql", newSql);
+        return invocation.proceed();
+    }
+
+    public String rooter(Statement statement, BoundSql boundSql) throws Throwable{
+        if (statement instanceof Select){
+            return this.processSelect((Select) statement);
+        }else if (statement instanceof Insert){
+            return this.processInsert((Insert) statement, boundSql);
+        }
+        return boundSql.getSql();
+    }
+
+    public String processSelect(Select select) throws Throwable{
+        StringBuffer whereSql = new StringBuffer();
+        PlainSelect plain = (PlainSelect)select.getSelectBody();
+        EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
+        List<SelectItem> selectItemList = plain.getSelectItems();
+        AtomicReference<Boolean> flag = new AtomicReference<>(false);
+        selectItemList.stream().forEach(selectItem -> {
+            if (selectItem.toString().equals("TENANT_CODE")){
+                flag.set(true);
             }
+        });
+        if (systemUser != null && flag.get()) {
+            whereSql.append("TENANT_CODE =");
+            whereSql.append(systemUser.getTenantCode());
+        }
 
-            Expression where = plain.getWhere();
-            Expression expression;
-            if (where == null) {
-                if (whereSql.length() > 0) {
-                    expression = CCJSqlParserUtil.parseCondExpression(whereSql.toString());
-                    plain.setWhere(expression);
-                }
-            } else {
-                if (whereSql.length() > 0 && EmptyUtil.isEmpty(plain.getJoins())) {
-                    whereSql.append(" and ( ").append(where.toString()).append(" )");
-                } else {
-                    whereSql = new StringBuffer();
-                    whereSql.append(where.toString());
-                }
-
+        Expression where = plain.getWhere();
+        Expression expression;
+        if (where == null) {
+            if (whereSql.length() > 0) {
                 expression = CCJSqlParserUtil.parseCondExpression(whereSql.toString());
                 plain.setWhere(expression);
             }
+        } else {
+            if (whereSql.length() > 0 && EmptyUtil.isEmpty(plain.getJoins())) {
+                whereSql.append(" and ( ").append(where.toString()).append(" )");
+            } else {
+                whereSql = new StringBuffer();
+                whereSql.append(where.toString());
+            }
 
-            metaObject.setValue("delegate.boundSql.sql", select.toString());
-            log.info("新sql===>" + select.toString());
-        } else if (statements.getStatements().get(0) instanceof Insert) {
-            EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
-            if (EmptyUtil.isNotEmpty(systemUser)) {
-                Long tenantCode = systemUser.getTenantCode();
-                Insert insert = (Insert)parserManager.parse(new StringReader(sql));
-                List<Column> columnList = insert.getColumns();
-                AtomicBoolean flag = new AtomicBoolean(false);
-                columnList.forEach(column -> {
-                    if (column.toString().equals("TENANT_CODE")){
-                        flag.set(true);
+            expression = CCJSqlParserUtil.parseCondExpression(whereSql.toString());
+            plain.setWhere(expression);
+        }
+
+        return select.toString();
+    }
+
+    public String processInsert(Insert insert, BoundSql boundSql){
+        EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
+        if (EmptyUtil.isNotEmpty(systemUser)) {
+            Long tenantCode = systemUser.getTenantCode();
+            List<Column> columnList = insert.getColumns();
+            AtomicBoolean flag = new AtomicBoolean(false);
+            columnList.forEach(column -> {
+                if (column.toString().equals("TENANT_CODE")){
+                    flag.set(true);
+                }
+            });
+            if (flag.get()) {
+                AtomicReference<Integer> index= new AtomicReference<>(0);
+                // 获取下标
+                Stream.iterate(0, i -> i + 1).limit(columnList.size()).forEach(i -> {
+                    if (columnList.get(i).toString().equals("TENANT_CODE")){
+                        index.set(i);
                     }
                 });
-                if (flag.get()) {
-                    AtomicReference<Integer> index= new AtomicReference<>(0);
-                    // 获取下标
-                    Stream.iterate(0, i -> i + 1).limit(columnList.size()).forEach(i -> {
-                        if (columnList.get(i).toString().equals("TENANT_CODE")){
-                            index.set(i);
-                        }
-                    });
-                    ((ExpressionList)insert.getItemsList()).getExpressions().set(index.get(), new StringValue(String.valueOf(tenantCode)));
-                    AtomicReference<Integer> index2= new AtomicReference<>(0);
-                    Stream.iterate(0, i -> i + 1).limit(boundSql.getParameterMappings().size()).forEach(i -> {
-                        if (boundSql.getParameterMappings().get(i).toString().contains("tenantCode")){
-                            index2.set(i);
-                        }
-                    });
-                    List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
-                    parameterMappingList.remove(parameterMappingList.get(index2.get()));
-                    metaObject.setValue("delegate.boundSql.sql", insert.toString());
-                    log.info("新sql===>" + insert.toString());
-                }
+                ((ExpressionList)insert.getItemsList()).getExpressions().set(index.get(), new StringValue(String.valueOf(tenantCode)));
+                AtomicReference<Integer> index2= new AtomicReference<>(0);
+                Stream.iterate(0, i -> i + 1).limit(boundSql.getParameterMappings().size()).forEach(i -> {
+                    if (boundSql.getParameterMappings().get(i).toString().contains("tenantCode")){
+                        index2.set(i);
+                    }
+                });
+                List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+                parameterMappingList.remove(parameterMappingList.get(index2.get()));
+                return insert.toString();
             }
-            return invocation.proceed();
-        } else {
-            return invocation.proceed();
         }
-        return invocation.proceed();
+        return boundSql.getSql();
     }
+
+
 
     public Object plugin(Object o) {
         return Plugin.wrap(o, this);
