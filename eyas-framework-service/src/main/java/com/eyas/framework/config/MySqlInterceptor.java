@@ -18,7 +18,6 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.DefaultReflectorFactory;
@@ -51,7 +50,7 @@ public class MySqlInterceptor implements Interceptor {
         String newSql = this.rooter(statement, boundSql);
 //        log.info("新sql===>" + newSql);
         metaObject.setValue("delegate.boundSql.sql", newSql);
-        MappedStatement mappedStatement = (MappedStatement)invocation.getArgs()[0];
+ //       MappedStatement mappedStatement = (MappedStatement)invocation.getArgs()[0];
 //        Object parameter =null;
 //        if (invocation.getArgs().length>1){
 //            parameter = invocation.getArgs()[1];
