@@ -18,6 +18,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.DefaultReflectorFactory;
@@ -25,9 +26,8 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.text.DateFormat;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -49,10 +49,51 @@ public class MySqlInterceptor implements Interceptor {
         EmptyUtil.dealEmptyDataReturn(statements.getStatements().get(0), "mysql插件异常，statements.getStatements().get(0)为空");
         Statement statement = statements.getStatements().get(0);
         String newSql = this.rooter(statement, boundSql);
-        log.info("新sql===>" + newSql);
+//        log.info("新sql===>" + newSql);
         metaObject.setValue("delegate.boundSql.sql", newSql);
+        MappedStatement mappedStatement = (MappedStatement)invocation.getArgs()[0];
+//        Object parameter =null;
+//        if (invocation.getArgs().length>1){
+//            parameter = invocation.getArgs()[1];
+//        }
+//        BoundSql boundSql = mappedStatement.getBoundSql(parameter);
+//        Configuration configuration = mappedStatement.getConfiguration();
+//
+//
+//        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+//        Object parameterObject = boundSql.getParameterObject();
+//
+//        MetaObject newMetaObject = configuration.newMetaObject(parameterObject);
+//        HashMap<String, String> hashMap = new HashMap<>();
+//        if (parameterObject !=null &&parameterMappings.size() >0){
+//            for (ParameterMapping parameterMapping : parameterMappings) {
+//                String propertyName = parameterMapping.getProperty();
+//
+//                String parameterValue = getParameterValue(newMetaObject.getValue(propertyName));
+//                hashMap.put(propertyName,parameterValue);
+//            }
+//        }
+//        log.info("param===>" + hashMap);
         return invocation.proceed();
     }
+
+    private static String getParameterValue(Object obj) {
+        String value = null;
+        if (obj instanceof String) {
+            value = "'" + obj.toString() + "'";
+        } else if (obj instanceof Date) {
+            DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.CHINA);
+            value = "'" + formatter.format(new Date()) + "'";
+        } else {
+            if (obj != null) {
+                value = obj.toString();
+            } else {
+                value = "";
+            }
+        }
+        return value;
+    }
+
 
     public String rooter(Statement statement, BoundSql boundSql) throws Throwable{
         if (statement instanceof Select){
