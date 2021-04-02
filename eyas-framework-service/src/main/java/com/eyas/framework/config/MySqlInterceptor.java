@@ -4,6 +4,7 @@ import com.eyas.framework.EmptyUtil;
 import com.eyas.framework.GsonUtil;
 import com.eyas.framework.data.EyasFrameworkDto;
 import com.eyas.framework.utils.TenantThreadLocal;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -28,10 +29,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.*;
@@ -54,11 +52,8 @@ import java.util.concurrent.atomic.AtomicReference;
                         method = "setParameters",
                         args = {PreparedStatement.class})
         })
+@Slf4j
 public class MySqlInterceptor implements Interceptor {
-    private static final Logger log = LoggerFactory.getLogger(MySqlInterceptor.class);
-
-    public MySqlInterceptor() {
-    }
 
     public Object intercept(Invocation invocation) throws Throwable {
         Object result = null;
@@ -81,15 +76,16 @@ public class MySqlInterceptor implements Interceptor {
             String newSql = this.rooter(statement, boundSql, metaObject);
             metaObject.setValue("delegate.boundSql.sql", newSql);
             result = invocation.proceed();
-        }else if(target instanceof ParameterHandler){
-            result = invocation.proceed();
-            ParameterHandler parameterHandler = (ParameterHandler)invocation.getTarget();
-
-            Method method = invocation.getMethod();
-            /*执行方法*/
-            result = invocation.proceed();
-//            log.info("xxxxxx ParameterHandler Interceptor, method " + method.getName());
         }
+//        else if(target instanceof ParameterHandler){
+//            result = invocation.proceed();
+//            ParameterHandler parameterHandler = (ParameterHandler)invocation.getTarget();
+//
+//            Method method = invocation.getMethod();
+            /*执行方法*/
+//            result = invocation.proceed();
+//            log.info("xxxxxx ParameterHandler Interceptor, method " + method.getName());
+//        }
 
 
 
@@ -111,7 +107,7 @@ public class MySqlInterceptor implements Interceptor {
         EyasFrameworkDto systemUser = (EyasFrameworkDto) TenantThreadLocal.getSystemUser();
         List<SelectItem> selectItemList = plain.getSelectItems();
         AtomicReference<Boolean> flag = new AtomicReference(false);
-        selectItemList.stream().forEach((selectItem) -> {
+        selectItemList.forEach((selectItem) -> {
             if (selectItem.toString().contains("TENANT_CODE")) {
                 flag.set(true);
             }
