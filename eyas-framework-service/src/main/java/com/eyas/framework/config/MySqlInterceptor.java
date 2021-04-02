@@ -1,9 +1,9 @@
 package com.eyas.framework.config;
 
 import com.eyas.framework.EmptyUtil;
+import com.eyas.framework.GsonUtil;
 import com.eyas.framework.data.EyasFrameworkDto;
 import com.eyas.framework.utils.TenantThreadLocal;
-import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -16,68 +16,110 @@ import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
-import net.sf.jsqlparser.statement.update.Update;
+import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
+import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
+import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.RowBounds;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.sql.PreparedStatement;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
 
-/**
- * @author Created by eyas on 2021/2/22.
- */
-@Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
-@Slf4j
+@Intercepts(
+        value = {
+                @Signature(
+                        type = StatementHandler.class,
+                        method = "prepare",
+                        args = {Connection.class, Integer.class}
+                ),
+                @Signature(
+                        type = Executor.class,
+                        method = "query",
+                        args = {MappedStatement.class,Object.class, RowBounds.class, ResultHandler.class}),
+                @Signature(
+                        type = ParameterHandler.class,
+                        method = "setParameters",
+                        args = {PreparedStatement.class})
+        })
 public class MySqlInterceptor implements Interceptor {
+    private static final Logger log = LoggerFactory.getLogger(MySqlInterceptor.class);
+
+    public MySqlInterceptor() {
+    }
 
     public Object intercept(Invocation invocation) throws Throwable {
-        StatementHandler statementHandler = (StatementHandler)invocation.getTarget();
-        MetaObject metaObject = MetaObject.forObject(statementHandler, SystemMetaObject.DEFAULT_OBJECT_FACTORY, SystemMetaObject.DEFAULT_OBJECT_WRAPPER_FACTORY, new DefaultReflectorFactory());
-        BoundSql boundSql = statementHandler.getBoundSql();
-        String sql = boundSql.getSql();
-        Statements statements = CCJSqlParserUtil.parseStatements(sql);
-        EmptyUtil.dealEmptyDataReturn(statements.getStatements(), "mysql插件异常，statements.getStatements()为空");
-        EmptyUtil.dealEmptyDataReturn(statements.getStatements().get(0), "mysql插件异常，statements.getStatements().get(0)为空");
-        Statement statement = statements.getStatements().get(0);
-        String newSql = this.rooter(statement, boundSql);
-        log.info("新sql===>" + newSql);
-        metaObject.setValue("delegate.boundSql.sql", newSql);
-        return invocation.proceed();
-    }
+        Object result = null;
+        Object target = invocation.getTarget();
+        if (target instanceof Executor) {
+            result = invocation.proceed(); // 执行请求方法，并将所得结果保存到result中
+            if (result instanceof List){
+                List<Object> list = (List<Object>) result;
+                log.info("<== Total:" + list.size());
+            }
+        }else if(target instanceof StatementHandler){
+            StatementHandler statementHandler = (StatementHandler)invocation.getTarget();
+            MetaObject metaObject = MetaObject.forObject(statementHandler, SystemMetaObject.DEFAULT_OBJECT_FACTORY, SystemMetaObject.DEFAULT_OBJECT_WRAPPER_FACTORY, new DefaultReflectorFactory());
+            BoundSql boundSql = statementHandler.getBoundSql();
+            String sql = boundSql.getSql();
+            Statements statements = CCJSqlParserUtil.parseStatements(sql);
+            EmptyUtil.dealEmptyDataReturn(statements.getStatements(), "mysql插件异常，statements.getStatements()为空");
+            EmptyUtil.dealEmptyDataReturn(statements.getStatements().get(0), "mysql插件异常，statements.getStatements().get(0)为空");
+            Statement statement = (Statement)statements.getStatements().get(0);
+            String newSql = this.rooter(statement, boundSql, metaObject);
+            metaObject.setValue("delegate.boundSql.sql", newSql);
+            result = invocation.proceed();
+        }else if(target instanceof ParameterHandler){
+            result = invocation.proceed();
+            ParameterHandler parameterHandler = (ParameterHandler)invocation.getTarget();
 
-    public String rooter(Statement statement, BoundSql boundSql) throws Throwable{
-        if (statement instanceof Select){
-            return this.processSelect((Select) statement);
-        }else if (statement instanceof Insert){
-            return this.processInsert((Insert) statement, boundSql);
-        }else if (statement instanceof Update){
-//            return this.processUpdate((Update) statement, boundSql);
+            Method method = invocation.getMethod();
+            /*执行方法*/
+            result = invocation.proceed();
+//            log.info("xxxxxx ParameterHandler Interceptor, method " + method.getName());
         }
-        return boundSql.getSql();
+
+
+
+        return result;
     }
 
-    public String processSelect(Select select) throws Throwable{
+
+    public String rooter(Statement statement, BoundSql boundSql, MetaObject metaObject) throws Throwable {
+        if (statement instanceof Select) {
+            return this.processSelect((Select)statement, metaObject);
+        } else {
+            return statement instanceof Insert ? this.processInsert((Insert)statement, boundSql, metaObject) : boundSql.getSql();
+        }
+    }
+
+    public String processSelect(Select select, MetaObject metaObject) throws Throwable {
         StringBuffer whereSql = new StringBuffer();
         PlainSelect plain = (PlainSelect)select.getSelectBody();
-        EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
+        EyasFrameworkDto systemUser = (EyasFrameworkDto) TenantThreadLocal.getSystemUser();
         List<SelectItem> selectItemList = plain.getSelectItems();
-        AtomicReference<Boolean> flag = new AtomicReference<>(false);
-        selectItemList.stream().forEach(selectItem -> {
-            if (selectItem.toString().equals("TENANT_CODE")){
+        AtomicReference<Boolean> flag = new AtomicReference(false);
+        selectItemList.stream().forEach((selectItem) -> {
+            if (selectItem.toString().contains("TENANT_CODE")) {
                 flag.set(true);
             }
+
         });
-        if (systemUser != null && flag.get()) {
+        // 判断租户code是否存在
+
+        if (systemUser != null && (Boolean)flag.get()) {
             whereSql.append("TENANT_CODE =");
             whereSql.append(systemUser.getTenantCode());
         }
@@ -101,101 +143,104 @@ public class MySqlInterceptor implements Interceptor {
             plain.setWhere(expression);
         }
 
+        this.str(select, metaObject);
+
         return select.toString();
     }
 
-    public String processInsert(Insert insert, BoundSql boundSql){
+
+    public String processInsert(Insert insert, BoundSql boundSql, MetaObject metaObject) {
         EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
         if (EmptyUtil.isNotEmpty(systemUser)) {
+
             Long tenantCode = systemUser.getTenantCode();
             List<Column> columnList = insert.getColumns();
             AtomicBoolean flag = new AtomicBoolean(false);
-            columnList.forEach(column -> {
-                if ("TENANT_CODE".equals(column.toString())){
+            columnList.forEach((column) -> {
+                if ("TENANT_CODE".equals(column.toString())) {
                     flag.set(true);
                 }
+
             });
             if (flag.get()) {
-                // 获取租户code坐标
                 int index = 0;
-                for (int i=0;i<columnList.size();i++){
-                    if ("TENANT_CODE".equals(columnList.get(i).toString())){
+
+                for(int i = 0; i < columnList.size(); ++i) {
+                    if ("TENANT_CODE".equals(((Column)columnList.get(i)).toString())) {
                         index = i;
                     }
                 }
-                // 单条数据跟批量数据不一样
-                // 给指定坐标index的租户code赋值
-                if (insert.getItemsList() instanceof ExpressionList){
+
+                if (insert.getItemsList() instanceof ExpressionList) {
                     ExpressionList expressionList = (ExpressionList)insert.getItemsList();
                     expressionList.getExpressions().set(index, new StringValue(String.valueOf(tenantCode)));
-                    //
-                }else if(insert.getItemsList() instanceof MultiExpressionList){
-                    MultiExpressionList multiExpressionList = (MultiExpressionList) insert.getItemsList();
-                    for (ExpressionList expression:
-                            multiExpressionList.getExprList()) {
+                } else if (insert.getItemsList() instanceof MultiExpressionList) {
+                    MultiExpressionList multiExpressionList = (MultiExpressionList)insert.getItemsList();
+                    Iterator var9 = multiExpressionList.getExprList().iterator();
+
+                    while(var9.hasNext()) {
+                        ExpressionList expression = (ExpressionList)var9.next();
                         expression.getExpressions().set(index, new StringValue(String.valueOf(tenantCode)));
                     }
                 }
-                // 移除问号影响
-                List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
-                List<ParameterMapping> parameterMappingList1 = new ArrayList<>();
 
-                for (int i=0;i<boundSql.getParameterMappings().size();i++){
-                    if (boundSql.getParameterMappings().get(i).toString().contains("tenantCode")){
+                List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
+                List<ParameterMapping> parameterMappingList1 = new ArrayList();
+
+                for(int i = 0; i < boundSql.getParameterMappings().size(); ++i) {
+                    if (((ParameterMapping)boundSql.getParameterMappings().get(i)).toString().contains("tenantCode")) {
                         parameterMappingList1.add(parameterMappingList.get(i));
                     }
                 }
+
                 if (!EmptyUtil.dealListForceEmpty(parameterMappingList1)) {
                     parameterMappingList.removeAll(parameterMappingList1);
                 }
+                this.str(insert, metaObject);
+                this.insertCount(boundSql.getParameterObject());
+
                 return insert.toString();
             }
         }
+
         return boundSql.getSql();
     }
 
-    public String processUpdate(Update update, BoundSql boundSql) throws Throwable{
-        EyasFrameworkDto systemUser = (EyasFrameworkDto)TenantThreadLocal.getSystemUser();
-
-        if (EmptyUtil.isNotEmpty(systemUser)){
-            Long tenantCode = systemUser.getTenantCode();
-            List<Column> columnList = update.getColumns();
-            AtomicBoolean flag = new AtomicBoolean(false);
-            columnList.forEach(column -> {
-                if (column.toString().equals("TENANT_CODE")){
-                    flag.set(true);
-                }
-            });
-            if (flag.get()) {
-                // 如果包含TENANT_CODE直接赋值
-                Expression where = update.getWhere();
-                Expression expression;
-                StringBuffer whereSql = new StringBuffer();
-                whereSql.append("TENANT_CODE =");
-                whereSql.append(tenantCode);
-                if (where == null) {
-                    if (whereSql.length() > 0) {
-
+    private void str(Object object1, MetaObject metaObject){
+        log.info("==>  Preparing: " + object1.toString());
+        Object object = metaObject.getValue("delegate.parameterHandler.parameterObject");
+        Map<String, Object> aa = GsonUtil.convertToMap(GsonUtil.objectToJson(object));
+        String paramString = "==> Parameters: ";
+        StringBuffer stringBuffer = new StringBuffer();
+        if (EmptyUtil.isNotEmpty(aa)) {
+            // 判断是一条数据还是多条数据
+            List<Object> bb = (List<Object>) aa.get("list");
+            if (EmptyUtil.isNotEmpty(bb)){
+                stringBuffer.append(aa.get("list") + ", ");
+            }else {
+                aa.forEach((k, v) -> {
+                    if (EmptyUtil.isNotEmpty(v)) {
+                        stringBuffer.append(k + ":" + v + ", ");
                     }
-                } else {
-                    if (whereSql.length() > 0 && EmptyUtil.isEmpty(update.getJoins())) {
-                        whereSql.append(" and ( ").append(where.toString()).append(" )");
-                    } else {
-                        whereSql = new StringBuffer();
-                        whereSql.append(where.toString());
-                    }
-                    expression = CCJSqlParserUtil.parseCondExpression(whereSql.toString());
-                    update.setWhere(expression);
-                }
+                });
+            }
+            if (EmptyUtil.isNotEmpty(stringBuffer)) {
+                log.info(paramString + stringBuffer.toString().substring(0, stringBuffer.length() - 2));
             }
         }
-
-
-
-        return update.toString();
     }
 
-
+    private void insertCount(Object object){
+        Integer count = null;
+        if (object instanceof Map){
+            Map<String, List<Object>> aa = (Map) object;
+            List<Object> ss = aa.get("list");
+            count = ss.size();
+        }else{
+            count = 1;
+        }
+        log.info("<== Total: " + count);
+    }
 
     public Object plugin(Object o) {
         return Plugin.wrap(o, this);
@@ -204,3 +249,4 @@ public class MySqlInterceptor implements Interceptor {
     public void setProperties(Properties properties) {
     }
 }
+
