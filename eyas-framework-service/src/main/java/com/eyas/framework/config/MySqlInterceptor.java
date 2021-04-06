@@ -77,15 +77,15 @@ public class MySqlInterceptor implements Interceptor {
             metaObject.setValue("delegate.boundSql.sql", newSql);
             result = invocation.proceed();
         }
-//        else if(target instanceof ParameterHandler){
-//            result = invocation.proceed();
-//            ParameterHandler parameterHandler = (ParameterHandler)invocation.getTarget();
-//
+        else if(target instanceof ParameterHandler){
+            result = invocation.proceed();
+            ParameterHandler parameterHandler = (ParameterHandler)invocation.getTarget();
+
 //            Method method = invocation.getMethod();
             /*执行方法*/
-//            result = invocation.proceed();
+            result = invocation.proceed();
 //            log.info("xxxxxx ParameterHandler Interceptor, method " + method.getName());
-//        }
+        }
 
 
 
