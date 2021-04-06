@@ -4,6 +4,7 @@ import com.eyas.framework.EmptyUtil;
 import com.eyas.framework.GsonUtil;
 import com.eyas.framework.data.EyasFrameworkDto;
 import com.eyas.framework.utils.TenantThreadLocal;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -28,10 +29,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.*;
@@ -54,11 +52,8 @@ import java.util.concurrent.atomic.AtomicReference;
                         method = "setParameters",
                         args = {PreparedStatement.class})
         })
+@Slf4j
 public class MySqlInterceptor implements Interceptor {
-    private static final Logger log = LoggerFactory.getLogger(MySqlInterceptor.class);
-
-    public MySqlInterceptor() {
-    }
 
     public Object intercept(Invocation invocation) throws Throwable {
         Object result = null;
@@ -81,11 +76,12 @@ public class MySqlInterceptor implements Interceptor {
             String newSql = this.rooter(statement, boundSql, metaObject);
             metaObject.setValue("delegate.boundSql.sql", newSql);
             result = invocation.proceed();
-        }else if(target instanceof ParameterHandler){
+        }
+        else if(target instanceof ParameterHandler){
             result = invocation.proceed();
             ParameterHandler parameterHandler = (ParameterHandler)invocation.getTarget();
 
-            Method method = invocation.getMethod();
+//            Method method = invocation.getMethod();
             /*执行方法*/
             result = invocation.proceed();
 //            log.info("xxxxxx ParameterHandler Interceptor, method " + method.getName());
@@ -111,7 +107,7 @@ public class MySqlInterceptor implements Interceptor {
         EyasFrameworkDto systemUser = (EyasFrameworkDto) TenantThreadLocal.getSystemUser();
         List<SelectItem> selectItemList = plain.getSelectItems();
         AtomicReference<Boolean> flag = new AtomicReference(false);
-        selectItemList.stream().forEach((selectItem) -> {
+        selectItemList.forEach((selectItem) -> {
             if (selectItem.toString().contains("TENANT_CODE")) {
                 flag.set(true);
             }
@@ -209,25 +205,29 @@ public class MySqlInterceptor implements Interceptor {
     private void str(Object object1, MetaObject metaObject){
         log.info("==>  Preparing: " + object1.toString());
         Object object = metaObject.getValue("delegate.parameterHandler.parameterObject");
-        Map<String, Object> aa = GsonUtil.convertToMap(GsonUtil.objectToJson(object));
+        String json = GsonUtil.objectToJson(object);
         String paramString = "==> Parameters: ";
-        StringBuffer stringBuffer = new StringBuffer();
-        if (EmptyUtil.isNotEmpty(aa)) {
-            // 判断是一条数据还是多条数据
-            List<Object> bb = (List<Object>) aa.get("list");
-            if (EmptyUtil.isNotEmpty(bb)){
-                stringBuffer.append(aa.get("list") + ", ");
-            }else {
-                aa.forEach((k, v) -> {
-                    if (EmptyUtil.isNotEmpty(v)) {
-                        stringBuffer.append(k + ":" + v + ", ");
-                    }
-                });
-            }
-            if (EmptyUtil.isNotEmpty(stringBuffer)) {
-                log.info(paramString + stringBuffer.toString().substring(0, stringBuffer.length() - 2));
-            }
-        }
+        log.info(paramString + json);
+//        Map<String, Object> aa = GsonUtil.convertToMap(GsonUtil.objectToJson(object));
+//
+//
+//        StringBuffer stringBuffer = new StringBuffer();
+//        if (EmptyUtil.isNotEmpty(aa)) {
+//            // 判断是一条数据还是多条数据
+//            List<Object> bb = (List<Object>) aa.get("list");
+//            if (EmptyUtil.isNotEmpty(bb)){
+//                stringBuffer.append(aa.get("list") + ", ");
+//            }else {
+//                aa.forEach((k, v) -> {
+//                    if (EmptyUtil.isNotEmpty(v)) {
+//                        stringBuffer.append(k + ":" + v + ", ");
+//                    }
+//                });
+//            }
+//            if (EmptyUtil.isNotEmpty(stringBuffer)) {
+//                log.info(paramString + stringBuffer.toString().substring(0, stringBuffer.length() - 2));
+//            }
+//        }
     }
 
     private void insertCount(Object object){
