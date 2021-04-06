@@ -205,25 +205,29 @@ public class MySqlInterceptor implements Interceptor {
     private void str(Object object1, MetaObject metaObject){
         log.info("==>  Preparing: " + object1.toString());
         Object object = metaObject.getValue("delegate.parameterHandler.parameterObject");
-        Map<String, Object> aa = GsonUtil.convertToMap(GsonUtil.objectToJson(object));
+        String json = GsonUtil.objectToJson(object);
         String paramString = "==> Parameters: ";
-        StringBuffer stringBuffer = new StringBuffer();
-        if (EmptyUtil.isNotEmpty(aa)) {
-            // 判断是一条数据还是多条数据
-            List<Object> bb = (List<Object>) aa.get("list");
-            if (EmptyUtil.isNotEmpty(bb)){
-                stringBuffer.append(aa.get("list") + ", ");
-            }else {
-                aa.forEach((k, v) -> {
-                    if (EmptyUtil.isNotEmpty(v)) {
-                        stringBuffer.append(k + ":" + v + ", ");
-                    }
-                });
-            }
-            if (EmptyUtil.isNotEmpty(stringBuffer)) {
-                log.info(paramString + stringBuffer.toString().substring(0, stringBuffer.length() - 2));
-            }
-        }
+        log.info(paramString + json);
+//        Map<String, Object> aa = GsonUtil.convertToMap(GsonUtil.objectToJson(object));
+//
+//
+//        StringBuffer stringBuffer = new StringBuffer();
+//        if (EmptyUtil.isNotEmpty(aa)) {
+//            // 判断是一条数据还是多条数据
+//            List<Object> bb = (List<Object>) aa.get("list");
+//            if (EmptyUtil.isNotEmpty(bb)){
+//                stringBuffer.append(aa.get("list") + ", ");
+//            }else {
+//                aa.forEach((k, v) -> {
+//                    if (EmptyUtil.isNotEmpty(v)) {
+//                        stringBuffer.append(k + ":" + v + ", ");
+//                    }
+//                });
+//            }
+//            if (EmptyUtil.isNotEmpty(stringBuffer)) {
+//                log.info(paramString + stringBuffer.toString().substring(0, stringBuffer.length() - 2));
+//            }
+//        }
     }
 
     private void insertCount(Object object){
