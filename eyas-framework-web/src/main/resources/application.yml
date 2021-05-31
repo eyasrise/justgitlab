@@ -25,7 +25,7 @@ spring:
 
   redis:
     database: 0
-    host: 148.70.121.147
+    host: 129.28.186.196
     port: 8803
     password: eyasAdmin
     jedis:

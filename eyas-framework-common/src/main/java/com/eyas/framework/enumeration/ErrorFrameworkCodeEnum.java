@@ -46,8 +46,13 @@ public enum ErrorFrameworkCodeEnum {
      * 系统异常
      */
     SYSTEM_ERROR(ErrorCodeUtil.getErrorCode(SystemConstant.DOMAIN, ErrorCodeTypeEnum.BIZ.getCode(), ErrorCodeSourceEnum.INTERNAL.getCode(), "000008"), "系統异常"),
-    ;
+    ,
 
+    /**
+     * 角色过期
+     */
+    USER_ROLE_EXPIRE_ERROR(ErrorCodeUtil.getErrorCode(SystemConstant.DOMAIN, ErrorCodeTypeEnum.BIZ.getCode(), ErrorCodeSourceEnum.INTERNAL.getCode(), "000009"), "用户角色已过期，请联系管理员"),
+    ;
 
     /**
      * 错误码

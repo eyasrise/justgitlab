@@ -76,10 +76,10 @@ public class EyasFrameworkQuery extends EyasFrameworkBaseQuery implements Serial
     private String extAtt;
 
     /**
-     * 项目编码code
+     * 租户编码code
      */
-    @ApiModelProperty(value = "项目编码code")
-    private Long projectCode;
+    @ApiModelProperty(value = "租户编码code")
+    private Long tenantCode;
 
     // 业务字段
 
@@ -87,7 +87,7 @@ public class EyasFrameworkQuery extends EyasFrameworkBaseQuery implements Serial
      * id多值
      */
     @ApiModelProperty(value = "id多值")
-    private List<String> ids;
+    private List<Long> ids;
 
     /**
      * status多值

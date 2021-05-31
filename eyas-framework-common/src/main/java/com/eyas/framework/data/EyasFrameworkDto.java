@@ -75,9 +75,9 @@ public class EyasFrameworkDto implements Serializable {
     private String extAtt;
 
     /**
-     * 项目编码code
+     * 租户编码code
      */
-    @ApiModelProperty(value = "项目编码code")
-    private Long projectCode;
+    @ApiModelProperty(value = "租户编码code")
+    private Long tenantCode;
 
 }

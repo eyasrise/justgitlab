@@ -1,6 +1,5 @@
 package com.eyas.framework;
 
-import com.auth0.jwt.interfaces.Claim;
 import com.eyas.framework.constant.SystemConstant;
 import com.eyas.framework.data.EyasFrameworkResult;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
@@ -58,7 +57,7 @@ public class JwtUtils {
                 claims = parseJWT(jwtStr);
                 return EyasFrameworkResult.ok(claims);
             } catch (Exception e) {
-                throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR, "");
+                throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.LOGIN_ERROR, "登录过期，请重新登录");
             }
         }
 

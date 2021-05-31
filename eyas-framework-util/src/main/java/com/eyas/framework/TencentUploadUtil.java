@@ -16,17 +16,17 @@ import java.io.File;
  */
 public class TencentUploadUtil {
 
-    public static String FILE_PATH = "https://eyas-ips-1259343588.cos.ap-shanghai.myqcloud.com";
+    public static String FILE_PATH = "https://eyas-ips-1259584691.cos.ap-chengdu.myqcloud.com";
 
     private static COSClient cosClient;
 
     static {
-        String secretId = "AKIDsaDhz7l0i5IJBrjo47wyrY3RltqefvoV";
-        String secretKey = "iRyK2f7PWaWOLQPDqIdtyBMRL4b5Uhu4";
+        String secretId = "AKIDSiw4b3L40xhDUcE7KUREqENuMbJJ745s";
+        String secretKey = "jBPBk8bu8aTAh5LSWO1QaU8Yl4LSGFBj";
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         // 2 设置 bucket 的区域, COS 地域的简称请参照 https://cloud.tencent.com/document/product/436/6224
         // clientConfig 中包含了设置 region, https(默认 http), 超时, 代理等 set 方法, 使用可参见源码或者常见问题 Java SDK 部分。
-        Region region = new Region("ap-shanghai");
+        Region region = new Region("ap-chengdu");
         ClientConfig clientConfig = new ClientConfig(region);
         // 3 生成 cos 客户端。
         cosClient = new COSClient(cred, clientConfig);
@@ -34,7 +34,7 @@ public class TencentUploadUtil {
 
     public static void readFileList(){
         try {
-            String bucket = "eyas-ips-1259343588";
+            String bucket = "eyas-ips-1259584691";
             ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
             // 设置 bucket 名称
             listObjectsRequest.setBucketName(bucket);
@@ -62,11 +62,11 @@ public class TencentUploadUtil {
         }
     }
 
-    public static PutObjectResult uploadFile(File file){
+    public static PutObjectResult uploadFile(File file,String filePath,String fileName){
         try {
             // 指定要上传到的存储桶
-            String bucketName = "eyas-ips-1259343588";
-            String key = "images/"+file.getName();
+            String bucketName = "eyas-ips-1259584691";
+            String key = filePath+"/"+fileName;
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, file);
             PutObjectResult putObjectResult = cosClient.putObject(putObjectRequest);
             return putObjectResult;
@@ -81,9 +81,8 @@ public class TencentUploadUtil {
     public static ObjectMetadata downloadFile(String key, String downloadPath){
         try{
             downloadPath = downloadPath + "\\" +key;
-            key = "images/" + key;
             // 指定对象所在的存储桶
-            String bucketName = "eyas-ips-1259343588";
+            String bucketName = "eyas-ips-1259584691";
             // 指定要下载到的本地路径
             File downFile = new File(downloadPath);
             GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, key);
@@ -100,8 +99,7 @@ public class TencentUploadUtil {
     public static void deleteFile(String key){
         try {
             // 指定对象所在的存储桶
-            String bucketName = "eyas-ips-1259343588";
-            key = "images/" + key;
+            String bucketName = "eyas-ips-1259584691";
             cosClient.deleteObject(bucketName, key);
         } catch (CosServiceException serverException) {
             serverException.printStackTrace();
