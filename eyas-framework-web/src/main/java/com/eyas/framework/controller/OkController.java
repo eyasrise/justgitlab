@@ -25,7 +25,7 @@ public class OkController {
 
     @GetMapping("/ok")
     public String ok(){
-        return "ok11!";
+        return "ok111111!";
     }
 
 //    @GetMapping("config/{key}")
