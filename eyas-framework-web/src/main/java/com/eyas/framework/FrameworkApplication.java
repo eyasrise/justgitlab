@@ -10,7 +10,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableAsync
 @SpringBootApplication
 @MapperScan(basePackages = {
-        "com.eyas.framework.dao"
+        "com.eyas.framework.dao",
+        "com.eyas.framework.annotation",
+        "com.eyas.framework.config"
 })
 @EnableSwagger2
 public class FrameworkApplication {
