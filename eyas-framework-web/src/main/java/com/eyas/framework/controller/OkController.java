@@ -1,12 +1,9 @@
 package com.eyas.framework.controller;
 
-import com.eyas.framework.GsonUtil;
 import com.eyas.framework.config.UseTask;
-import com.eyas.framework.data.EyasFrameworkDto;
 import com.eyas.framework.data.EyasFrameworkResult;
 import com.eyas.framework.entity.UserEntityQuery;
 import com.eyas.framework.intf.RedisService;
-import com.eyas.framework.utils.TenantThreadLocal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +25,6 @@ public class OkController {
 
     @GetMapping("/ok")
     public String ok(){
-        EyasFrameworkDto systemUser = (EyasFrameworkDto) TenantThreadLocal.getSystemUser();
-        GsonUtil.objectToJson(systemUser);
         return "ok11!";
     }
 
