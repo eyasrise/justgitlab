@@ -108,7 +108,8 @@ public class MySqlInterceptor implements Interceptor {
         List<SelectItem> selectItemList = plain.getSelectItems();
         AtomicReference<Boolean> flag = new AtomicReference(false);
         selectItemList.forEach((selectItem) -> {
-            if (selectItem.toString().contains("TENANT_CODE")) {
+            if (selectItem.toString().toLowerCase().contains("TENANT_CODE".toLowerCase())
+                    || selectItem.toString().toLowerCase().contains("count(1)".toLowerCase())) {
                 flag.set(true);
             }
 
