@@ -58,5 +58,15 @@ public class DipperInfoController {
         return EyasFrameworkResult.ok(cnt);
     }
 
+    @PostMapping("/batchInsert")
+    @WithOutToken
+    public EyasFrameworkResult<Integer> batchInsert(@RequestBody List<DipperInfoDTO> dipperInfoDTOList){
+        EyasFrameworkDto eyasFrameworkDto = new EyasFrameworkDto();
+        eyasFrameworkDto.setTenantCode(100L);
+        TenantThreadLocal.setSystemUser(eyasFrameworkDto);
+        Integer cnt = this.dipperInfo.batchInsert(dipperInfoDTOList);
+        return EyasFrameworkResult.ok(cnt);
+    }
+
 
 }
