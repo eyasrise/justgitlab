@@ -203,11 +203,15 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer updateByDelete(Dto dto){
+        Integer cnt = 0;
         D d = this.dtoToD(dto);
         // 先执行删除
-        this.eyasFrameworkMiddle.delete(d);
-        // 再执行新增
-        return this.insert(dto);
+        Integer deleteResult = this.eyasFrameworkMiddle.delete(d);
+        if (EmptyUtil.isNotEmpty(deleteResult) && 1 == deleteResult){
+            // 再执行新增
+            return this.insert(dto);
+        }
+        return cnt;
     }
 
 }
