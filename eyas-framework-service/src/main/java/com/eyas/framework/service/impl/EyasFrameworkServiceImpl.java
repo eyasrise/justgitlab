@@ -25,8 +25,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<Dto,Q> {
 
-    @Autowired
-    private EyasFrameworkMiddle<D,Q> eyasFrameworkMiddle;
+    private final EyasFrameworkMiddle<D,Q> eyasFrameworkMiddle;
+
+    public EyasFrameworkServiceImpl(EyasFrameworkMiddle<D, Q> eyasFrameworkMiddle) {
+        this.eyasFrameworkMiddle = eyasFrameworkMiddle;
+    }
 
 
     private D dtoToD(Dto dto){

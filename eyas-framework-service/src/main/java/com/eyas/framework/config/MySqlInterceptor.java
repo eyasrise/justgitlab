@@ -80,11 +80,7 @@ public class MySqlInterceptor implements Interceptor {
         else if(target instanceof ParameterHandler){
             result = invocation.proceed();
             ParameterHandler parameterHandler = (ParameterHandler)invocation.getTarget();
-
-//            Method method = invocation.getMethod();
-            /*执行方法*/
             result = invocation.proceed();
-//            log.info("xxxxxx ParameterHandler Interceptor, method " + method.getName());
         }
 
 

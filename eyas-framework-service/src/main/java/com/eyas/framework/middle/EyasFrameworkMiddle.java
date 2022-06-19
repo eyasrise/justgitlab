@@ -12,8 +12,11 @@ import java.util.List;
 @Component
 public class EyasFrameworkMiddle<D, Q> {
 
-    @Autowired
-    private EyasFrameworkDao<D, Q> eyasFrameworkDao;
+    private final EyasFrameworkDao<D, Q> eyasFrameworkDao;
+
+    public EyasFrameworkMiddle(EyasFrameworkDao<D, Q> eyasFrameworkDao) {
+        this.eyasFrameworkDao = eyasFrameworkDao;
+    }
 
     public Integer insert(D d) {
         return this.eyasFrameworkDao.insert(d);

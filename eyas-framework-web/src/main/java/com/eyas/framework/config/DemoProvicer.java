@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DemoProvicer implements UserProvider {
 
-    private final DatabaseService databaseService;
+    private DatabaseService databaseService;
 
     @Override
     public EyasFrameworkUserInfo getUserInfo(String userId, EyasFrameworkTokenInfo eyasFrameworkTokenInfo) {
