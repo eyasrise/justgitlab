@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 /**
  * @author Created by yixuan on 2018/12/27.
@@ -39,6 +38,19 @@ public class ListUtil {
             }
         }
         return lists;
+    }
+
+    /**
+     * 将list进行拆分，可以用于批量更新，去空
+     *
+     * @param strList     用于拆分的集合
+     * @param splitNumber 拆个数
+     * @param removeNull 是否需要进行空数据移除
+     * @return 拆分后的多个子集合
+     */
+    public static <T> List<List<T>> splitList(List<T> strList, Integer splitNumber, boolean removeNull) {
+        strList.removeIf(Objects::isNull);
+        return ListUtil.splitList(strList, splitNumber);
     }
 
     /**
