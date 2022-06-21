@@ -3,10 +3,15 @@ package com.eyas.framework.controller;
 import com.eyas.framework.annotation.WithOutToken;
 import com.eyas.framework.config.UseTask;
 import com.eyas.framework.data.EyasFrameworkResult;
+import com.eyas.framework.entity.UserEntity;
 import com.eyas.framework.entity.UserEntityQuery;
 import com.eyas.framework.intf.RedisService;
+import com.eyas.framework.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -22,11 +27,21 @@ public class OkController {
     @Autowired
     private UseTask useTask;
 
+    @Autowired
+    private UserServiceImpl userService;
+
 
 
     @GetMapping("/ok")
     @WithOutToken
     public String ok(){
+        UserEntityQuery userEntityQuery = new UserEntityQuery();
+        List<UserEntity > userEntityList = new ArrayList<>();
+        UserEntity userEntity = new UserEntity();
+        userEntityQuery.setUserName("王瑞");
+        userEntity.setUserName("鼠忆轩");
+        userEntityList.add(userEntity);
+        this.userService.ceShi(userEntityQuery, userEntityList);
         return "ok111111!";
     }
 

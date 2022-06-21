@@ -10,7 +10,7 @@ import java.math.BigDecimal;
  * @author Created by yixuan on 2019/7/11.
  */
 @Data
-public class UserEntity extends EyasFrameworkDo {
+public class UserEntityDo extends EyasFrameworkDo {
 
     /**
      * 用户名

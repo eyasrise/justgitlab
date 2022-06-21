@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Created by yixuan on 2019/1/17.
  */
 @Service
-public class EyasFrameworkServiceImpl<Dto,D,Q> extends EyasFrameworkAbstractService implements EyasFrameworkService<Dto,Q> {
+public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<Dto,Q> {
 
     private final EyasFrameworkMiddle<D,Q> eyasFrameworkMiddle;
 
@@ -216,7 +216,4 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> extends EyasFrameworkAbstractServ
         return this.eyasFrameworkMiddle.batchInsert(dList);
     }
 
-    public Integer FatherBatchUpdate(List<Dto> dtoList, Integer splitNumber){
-        return super.batchUpdate(dtoList, splitNumber);
-    }
 }
