@@ -1,5 +1,6 @@
 package com.eyas.framework.controller;
 
+import com.eyas.framework.annotation.WithOutToken;
 import com.eyas.framework.config.UseTask;
 import com.eyas.framework.data.EyasFrameworkResult;
 import com.eyas.framework.entity.UserEntityQuery;
@@ -24,6 +25,7 @@ public class OkController {
 
 
     @GetMapping("/ok")
+    @WithOutToken
     public String ok(){
         return "ok111111!";
     }
