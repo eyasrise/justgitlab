@@ -43,9 +43,9 @@ public class RedisServiceImpl implements RedisService {
     /**
      * 锁失效时间
      */
-    public static final Integer PRODUCT_CACHE_LEASE_TIME = 60;
+    public static final Integer PRODUCT_CACHE_LEASE_TIME = 60000;
 
-    public static final Integer PRODUCT_LOCK_DEFAULT_WAIT_TIME = 5;
+    public static final Integer PRODUCT_LOCK_DEFAULT_WAIT_TIME = 1000;
 
 
     @Autowired
@@ -668,24 +668,37 @@ public class RedisServiceImpl implements RedisService {
     }
 
     /**
-     *
      * 锁等待时间如果为空，默认设置1s一次;
-     * 锁等待时间不宜大于10s,如果锁等待时间大于10s，默认修改成5s
-     * @see PRODUCT_LOCK_DEFAULT_WAIT_TIME
+     * 锁等待时间不宜大于看门狗的触发时间(续期时间/3),如果锁等待时间大于看门狗的触发时间，默认修改成看门狗的触发时间/2
+     * 比如:redisson默认的续期时间是30s,看门狗的触发时间是30s/3=10s
+     * 那么如果锁等待时间设置超过了10s，其实不合理，这种场景项目默认设置成10s/2=5s
      * leaseTime:锁失效时间，默认为设置为60s，看门狗运行6次，锁30s默认续期一次
-     * @see PRODUCT_CACHE_LEASE_TIME
+     * @see PRODUCT_CACHE_LEASE_TIME 60s
      * @param key 锁key
      * @param waitTime 线程等待拿锁时间
      * @return 拿锁结果
      */
     @Override
-    public boolean redissonTryLock(String key, long waitTime){
+    public boolean redissonTryLock(String key, long waitTime, TimeUnit timeUnit){
         RLock hotCacheLock = redisson.getLock(key);
         try {
             if (EmptyUtil.isEmpty(waitTime)){
-                return hotCacheLock.tryLock(PRODUCT_LOCK_DEFAULT_WAIT_TIME, PRODUCT_CACHE_LEASE_TIME, TimeUnit.SECONDS);
+                waitTime = PRODUCT_LOCK_DEFAULT_WAIT_TIME;
             }
-            return hotCacheLock.tryLock(waitTime, PRODUCT_CACHE_LEASE_TIME, TimeUnit.SECONDS);
+            // 获取看门狗时间
+            long lockWatchdogTimeout = redisson.getConfig().getLockWatchdogTimeout();
+            if (EmptyUtil.isEmpty(lockWatchdogTimeout)){
+                redisson.getConfig().setLockWatchdogTimeout(30000L);
+                lockWatchdogTimeout = 30000L;
+            }
+            // 判断时间：等待时间理论上不应该超过看门狗的触发时间也就是续期时间/3
+            // 默认给续期时间/3的基础上再折一半
+            // 获取一下等待时间
+            long waitTimeMs = timeUnit.toMillis(waitTime);
+            if (waitTimeMs > lockWatchdogTimeout/3){
+                waitTimeMs = lockWatchdogTimeout/6;
+            }
+            return hotCacheLock.tryLock(waitTimeMs, PRODUCT_CACHE_LEASE_TIME, timeUnit);
         } catch (InterruptedException e) {
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
         }

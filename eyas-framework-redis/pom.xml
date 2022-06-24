@@ -20,8 +20,15 @@
 
         <dependency>
             <groupId>com.eyas</groupId>
-            <artifactId>eyas-framework-service</artifactId>
+            <artifactId>eyas-framework-util</artifactId>
             <version>0.0.2-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>1.9.2</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

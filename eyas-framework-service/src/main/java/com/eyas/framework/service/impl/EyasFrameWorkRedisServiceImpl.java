@@ -6,10 +6,14 @@ import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import com.eyas.framework.intf.RedisService;
 import com.eyas.framework.middle.EyasFrameworkMiddle;
 import com.eyas.framework.service.intf.EyasFrameWorkRedisService;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 @Service
+@Slf4j
 public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameWorkRedisService<Dto,D,Q> {
 
     private final RedisService redisService;
@@ -72,47 +76,64 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * ②查询数据的时候使用读锁
      * 当两个线程的mode都是read read的时候，支持并发访问，提高性能
      *
-     * @param key 缓存key
-     * @param time 缓存key失效时间，可以为空
+     * @param element 缓存key
+     * @param waitTime 缓存key失效时间，可以为空
      * @param elementKeyId 缓存key对应的数据id-用来获取数据库数据
      * @return Object
      */
     @Override
-    public Object getRedisElement(String key, long time, String elementKeyId){
-        Object object = this.redisService.getElementFromCache(key);
+    public Object getRedisElement(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
+        String elementKey = element + ":key";
+        String elementReadWriteKey = element + ":readWriteKey";
+        Object object = this.redisService.getElementFromCache(element);
         if (null != object){
+            log.info(Thread.currentThread().getName() + "线程--->获取到数据了！");
             // 如果不是空返回
             return object;
         }
+        log.info(Thread.currentThread().getName() + "线程--->没有获取数据了！");
         // DCL-双重检查锁--防止缓存失效
         // 这个时间需要根据情况设置-可以为空，默认30s
-        boolean lockFlag = this.redisService.redissonTryLock(key, time);
-        if (lockFlag){
+        boolean lockFlag = this.redisService.redissonTryLock(elementKey, waitTime, timeUnit);
+        try {
+            if (lockFlag){
+                log.info(Thread.currentThread().getName() + "线程--->加锁成功！");
+            }else{
+                log.info(Thread.currentThread().getName() + "线程--->获取锁失败，自旋等待！");
+            }
             // 继续查询一下缓存
-            object = this.redisService.getElementFromCache(key);
+            object = this.redisService.getElementFromCache(element);
             if (null != object){
                 // 如果不是空返回
                 return object;
             }
             // 加读锁--为了提高性能
-            RLock rLock = this.redisService.redissonReadLock(key);
+            RLock rLock = this.redisService.redissonReadLock(elementReadWriteKey);
             try {
                 // 查询数据库--调用父类方法
-                object = super.getInfoById(Long.valueOf(elementKeyId));
+//                object = super.getInfoById(Long.valueOf(elementKeyId));
+                // 模拟设置
+                object = "1212212";
+                log.info(Thread.currentThread().getName() + "线程--->打到数据库了！！！");
                 if (EmptyUtil.isNotEmpty(object)) {
                     // 缓存redis
-                    this.redisService.set(key, object);
+                    this.redisService.set(element, object);
                     // 缓存本地map
-                    this.redisService.getElementMap().put(key, object);
+                    this.redisService.getElementMap().put(element, object);
                 }else{
                     // 防止缓存穿透--缓存空数据
-                    this.redisService.expire(key, this.redisService.genEmptyCacheTimeout());
+                    this.redisService.expire(element, this.redisService.genEmptyCacheTimeout());
                 }
             }catch (Exception e){
                 throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "获取商品失败!");
             }finally {
+                log.info(Thread.currentThread().getName() + "线程--->释放锁");
                 this.redisService.redissonReadWriteUnLock(rLock);
             }
+        }catch(Exception e){
+
+        }finally {
+            this.redisService.redissonUnLock(elementKey);
         }
         return object;
     }

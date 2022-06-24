@@ -3,6 +3,7 @@ package com.eyas.framework.intf;
 import org.redisson.api.RLock;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Created by yixuan on 2019/7/23.
@@ -25,7 +26,7 @@ public interface RedisService {
 
     Map<String, Object> getElementMap();
 
-    boolean redissonTryLock(String key, long waitTime);
+    boolean redissonTryLock(String key, long waitTime, TimeUnit timeUnit);
 
     void redissonUnLock(String key);
 
