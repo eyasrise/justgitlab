@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkServiceImpl<Dto,D,Q> {
 
-    private RedisService redisService;
+    private final RedisService redisService;
 
     public EyasFrameWorkRedisServiceImpl(EyasFrameworkMiddle<D, Q> eyasFrameworkMiddle,
                                          RedisService redisService) {
@@ -69,11 +69,12 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             // 加读锁--为了提高性能
             RLock rLock = this.redisService.redissonReadLock(key);
             try {
-                // 查询数据库
-                object = this.getInfoById(Long.valueOf(elementKeyId));
+                // 查询数据库--调用父类方法
+                object = super.getInfoById(Long.valueOf(elementKeyId));
                 if (EmptyUtil.isEmpty(object)) {
                     // 缓存redis
                     this.redisService.set(key, object);
+                    // 缓存本地map
                     this.redisService.getElementMap().put(key, object);
                 }else{
                     // 防止缓存穿透--缓存空数据
