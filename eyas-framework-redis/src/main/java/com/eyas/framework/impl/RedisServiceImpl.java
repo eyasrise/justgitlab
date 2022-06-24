@@ -1,8 +1,13 @@
 package com.eyas.framework.impl;
 
+import com.eyas.framework.config.RedissonConfig;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import com.eyas.framework.intf.RedisService;
+import org.redisson.Redisson;
+import org.redisson.api.RBloomFilter;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.RedisCallback;
@@ -24,9 +29,12 @@ public class RedisServiceImpl implements RedisService {
 
     private final RedisTemplate redisTemplate;
 
+    private final Redisson redisson;
+
     @Autowired
-    public RedisServiceImpl(RedisTemplate redisTemplate) {
+    public RedisServiceImpl(RedisTemplate redisTemplate, Redisson redisson) {
         this.redisTemplate = redisTemplate;
+        this.redisson = redisson;
     }
 
 //=============================common============================
@@ -627,6 +635,22 @@ public class RedisServiceImpl implements RedisService {
         if (1L != result) {
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "release lock fail");
         }
+    }
+
+    @Override
+    public boolean redissonTryLock(String key, long time){
+        RLock hotCacheLock = redisson.getLock(key);
+        try {
+            return hotCacheLock.tryLock(time, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
+        }
+    }
+
+    @Override
+    public void redissonUnLock(String key){
+        RLock hotCacheLock = redisson.getLock(key);
+        hotCacheLock.unlock();
     }
 
 }

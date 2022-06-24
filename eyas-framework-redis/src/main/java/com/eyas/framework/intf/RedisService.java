@@ -17,4 +17,8 @@ public interface RedisService {
 
     void releaseLock(String key, String value);
 
+    boolean redissonTryLock(String key, long time);
+
+    void redissonUnLock(String key);
+
 }
