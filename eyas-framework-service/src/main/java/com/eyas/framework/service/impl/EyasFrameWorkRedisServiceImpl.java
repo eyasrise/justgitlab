@@ -80,6 +80,10 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * @param waitTime 缓存key失效时间，可以为空
      * @param elementKeyId 缓存key对应的数据id-用来获取数据库数据
      * @return Object
+     *
+     * 测试结果:
+     * v1-2022-06-24
+     * 并发10个，效果达到，但是有部分线程未能获取到数据(可能跟DCL加锁有关系)，存在bug
      */
     @Override
     public Object getRedisElement(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
@@ -131,7 +135,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
                 this.redisService.redissonReadWriteUnLock(rLock);
             }
         }catch(Exception e){
-
+            throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
         }finally {
             this.redisService.redissonUnLock(elementKey);
         }
