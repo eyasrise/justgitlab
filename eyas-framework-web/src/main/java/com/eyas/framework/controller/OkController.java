@@ -1,5 +1,6 @@
 package com.eyas.framework.controller;
 
+import com.eyas.framework.GsonUtil;
 import com.eyas.framework.annotation.WithOutToken;
 import com.eyas.framework.config.UseTask;
 import com.eyas.framework.data.EyasFrameworkResult;
@@ -7,6 +8,7 @@ import com.eyas.framework.entity.UserEntity;
 import com.eyas.framework.entity.UserEntityQuery;
 import com.eyas.framework.intf.RedisService;
 import com.eyas.framework.service.UserServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/hello")
+@Slf4j
 public class OkController {
 
     @Autowired
@@ -77,6 +80,14 @@ public class OkController {
                 e.printStackTrace();
             }
         }
+    }
+
+    @GetMapping("/testRedis")
+    @WithOutToken
+    public void testRedis(){
+        this.redisService.set("eyas", "eyas-framework");
+        Object object = this.redisService.get("eyas");
+        log.info(GsonUtil.objectToJson(object));
     }
 
 }

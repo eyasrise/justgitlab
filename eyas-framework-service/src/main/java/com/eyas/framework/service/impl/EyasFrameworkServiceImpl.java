@@ -10,6 +10,7 @@ import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import com.eyas.framework.middle.EyasFrameworkMiddle;
 import com.eyas.framework.service.intf.EyasFrameworkService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,6 +115,16 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
     @Override
     public Integer update(Dto dto){
         D d = this.dtoToD(dto);
+        return this.eyasFrameworkMiddle.updateNoLock(d);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer updateByLock(Dto dto, Long id){
+        D d = this.eyasFrameworkMiddle.getInfoById(id);
+        if (EmptyUtil.isNotEmpty(d)){
+            BeanUtils.copyProperties(dto, d);
+        }
         return this.eyasFrameworkMiddle.updateNoLock(d);
     }
 

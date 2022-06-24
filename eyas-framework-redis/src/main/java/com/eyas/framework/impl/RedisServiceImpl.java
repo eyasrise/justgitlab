@@ -8,6 +8,7 @@ import com.eyas.framework.intf.RedisService;
 import org.redisson.Redisson;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
+import org.redisson.api.RReadWriteLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisStringCommands;
@@ -34,7 +35,6 @@ public class RedisServiceImpl implements RedisService {
     public static Map<String, Object> elementMap = new ConcurrentHashMap<>();
 
     public static final String EMPTY_CACHE = "{}";
-
 
     private final RedisTemplate redisTemplate;
 
@@ -646,10 +646,27 @@ public class RedisServiceImpl implements RedisService {
         }
     }
 
+    //===============================redisson=================================
+
+
+    @Override
+    public Map<String, Object> getElementMap() {
+        return elementMap;
+    }
+
+    @Override
+    public void setElementMap(Map<String, Object> elementMap) {
+        RedisServiceImpl.elementMap = elementMap;
+    }
+
     @Override
     public boolean redissonTryLock(String key, long time){
         RLock hotCacheLock = redisson.getLock(key);
         try {
+            if (EmptyUtil.isEmpty(time)){
+                // 不设置超时时间默认30s
+                return hotCacheLock.tryLock();
+            }
             return hotCacheLock.tryLock(time, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
@@ -711,7 +728,7 @@ public class RedisServiceImpl implements RedisService {
             }
             // 如果不为空
             // 相对热数据续期--增加随机数--避免缓存失效
-            this.expire(key, genProductCacheTimeout());
+            this.expire(key, getElementCacheTimeout());
             return object;
         }
         return null;
@@ -721,12 +738,36 @@ public class RedisServiceImpl implements RedisService {
      * 续期时间
      * @return
      */
-    private Integer genEmptyCacheTimeout() {
+    @Override
+    public Integer genEmptyCacheTimeout() {
         return 60 + new Random().nextInt(30);
     }
 
-    private Integer genProductCacheTimeout() {
+    @Override
+    public Integer getElementCacheTimeout() {
         return PRODUCT_CACHE_TIMEOUT + new Random().nextInt(5) * 60 * 60;
     }
+
+    @Override
+    public RLock redissonWriteLock(String key){
+        RReadWriteLock readWriteLock = redisson.getReadWriteLock(key);
+        RLock writeLock = readWriteLock.writeLock();
+        writeLock.lock();
+        return writeLock;
+    }
+
+    @Override
+    public RLock redissonReadLock(String key){
+        RReadWriteLock readWriteLock = redisson.getReadWriteLock(key);
+        RLock readLock = readWriteLock.readLock();
+        readLock.lock();
+        return readLock;
+    }
+
+    @Override
+    public boolean redissonReadWriteUnLock(RLock rLock){
+        return rLock.unlink();
+    }
+
 
 }

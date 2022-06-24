@@ -1,5 +1,9 @@
 package com.eyas.framework.intf;
 
+import org.redisson.api.RLock;
+
+import java.util.Map;
+
 /**
  * @author Created by yixuan on 2019/7/23.
  */
@@ -16,6 +20,10 @@ public interface RedisService {
     String tryLock(String key, Long tryMillis, Long expireMillis);
 
     void releaseLock(String key, String value);
+
+    void setElementMap(Map<String, Object> elementMap);
+
+    Map<String, Object> getElementMap();
 
     boolean redissonTryLock(String key, long time);
 
@@ -37,5 +45,43 @@ public interface RedisService {
      * @return Object
      */
     Object getElementFromCache(String key);
+
+    /**
+     * 系统默认的缓存失效时间
+     *
+     * @return Integer
+     */
+    Integer getElementCacheTimeout();
+
+    /**
+     * 系统默认的空值缓存时间
+     *
+     * @return
+     */
+    Integer genEmptyCacheTimeout();
+
+    /**
+     * 读写锁-写锁
+     *
+     * @param key
+     * @return RLock
+     */
+    RLock redissonWriteLock(String key);
+
+    /**
+     * 读写锁-读锁
+     *
+     * @param key
+     * @return RLock
+     */
+    RLock redissonReadLock(String key);
+
+    /**
+     * 读写锁失效
+     *
+     * @param rLock 读写锁失效
+     * @return
+     */
+    boolean redissonReadWriteUnLock(RLock rLock);
 
 }

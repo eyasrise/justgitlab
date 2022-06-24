@@ -44,6 +44,15 @@ public interface EyasFrameworkService<Dto, Q> {
     Integer update(Dto dto);
 
     /**
+     * 修改带乐观锁
+     *
+     * @param dto 修改对象
+     * @param id 修改id
+     * @return
+     */
+    Integer updateByLock(Dto dto, Long id);
+
+    /**
      * 更新数据-带乐观锁
      *
      * @param dto
