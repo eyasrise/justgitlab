@@ -25,7 +25,7 @@ public interface RedisService {
 
     Map<String, Object> getElementMap();
 
-    boolean redissonTryLock(String key, long time);
+    boolean redissonTryLock(String key, long waitTime);
 
     void redissonUnLock(String key);
 

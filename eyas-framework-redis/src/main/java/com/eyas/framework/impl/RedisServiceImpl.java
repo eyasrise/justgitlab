@@ -40,6 +40,14 @@ public class RedisServiceImpl implements RedisService {
 
     private final Redisson redisson;
 
+    /**
+     * 锁失效时间
+     */
+    public static final Integer PRODUCT_CACHE_LEASE_TIME = 60;
+
+    public static final Integer PRODUCT_LOCK_DEFAULT_WAIT_TIME = 5;
+
+
     @Autowired
     public RedisServiceImpl(RedisTemplate redisTemplate, Redisson redisson) {
         this.redisTemplate = redisTemplate;
@@ -659,15 +667,25 @@ public class RedisServiceImpl implements RedisService {
         RedisServiceImpl.elementMap = elementMap;
     }
 
+    /**
+     *
+     * 锁等待时间如果为空，默认设置1s一次;
+     * 锁等待时间不宜大于10s,如果锁等待时间大于10s，默认修改成5s
+     * @see PRODUCT_LOCK_DEFAULT_WAIT_TIME
+     * leaseTime:锁失效时间，默认为设置为60s，看门狗运行6次，锁30s默认续期一次
+     * @see PRODUCT_CACHE_LEASE_TIME
+     * @param key 锁key
+     * @param waitTime 线程等待拿锁时间
+     * @return 拿锁结果
+     */
     @Override
-    public boolean redissonTryLock(String key, long time){
+    public boolean redissonTryLock(String key, long waitTime){
         RLock hotCacheLock = redisson.getLock(key);
         try {
-            if (EmptyUtil.isEmpty(time)){
-                // 不设置超时时间默认30s
-                return hotCacheLock.tryLock();
+            if (EmptyUtil.isEmpty(waitTime)){
+                return hotCacheLock.tryLock(PRODUCT_LOCK_DEFAULT_WAIT_TIME, PRODUCT_CACHE_LEASE_TIME, TimeUnit.SECONDS);
             }
-            return hotCacheLock.tryLock(time, TimeUnit.SECONDS);
+            return hotCacheLock.tryLock(waitTime, PRODUCT_CACHE_LEASE_TIME, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
         }
@@ -768,6 +786,4 @@ public class RedisServiceImpl implements RedisService {
     public boolean redissonReadWriteUnLock(RLock rLock){
         return rLock.unlink();
     }
-
-
 }
