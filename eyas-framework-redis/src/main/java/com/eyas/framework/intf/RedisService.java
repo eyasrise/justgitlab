@@ -21,4 +21,21 @@ public interface RedisService {
 
     void redissonUnLock(String key);
 
+    /**
+     * 获取redis数据(高可用)
+     *
+     * @param key redisKey
+     * @param bloomFilterExist 是否使用布隆过滤器
+     * @return Object
+     */
+    Object getElementFromCache(String key, boolean bloomFilterExist);
+
+    /**
+     * 获取redis数据(高可用)
+     *
+     * @param key redisKey
+     * @return Object
+     */
+    Object getElementFromCache(String key);
+
 }

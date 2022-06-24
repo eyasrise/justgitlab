@@ -1,5 +1,6 @@
 package com.eyas.framework.impl;
 
+import com.eyas.framework.EmptyUtil;
 import com.eyas.framework.config.RedissonConfig;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,6 +28,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class RedisServiceImpl implements RedisService {
+
+    public static final Integer PRODUCT_CACHE_TIMEOUT = 24;
+
+    public static Map<String, Object> elementMap = new ConcurrentHashMap<>();
+
+    public static final String EMPTY_CACHE = "{}";
+
 
     private final RedisTemplate redisTemplate;
 
@@ -651,6 +660,73 @@ public class RedisServiceImpl implements RedisService {
     public void redissonUnLock(String key){
         RLock hotCacheLock = redisson.getLock(key);
         hotCacheLock.unlock();
+    }
+
+    @Override
+    public Object getElementFromCache(String key){
+        return getElementFromCache(key, false);
+    }
+
+    @Override
+    public Object getElementFromCache(String key, boolean bloomFilterExist){
+        // 本地获取--这个map需要热数据维护
+        Object element = elementMap.get(key);
+        if (EmptyUtil.isNotEmpty(element)){
+            return element;
+        }
+        // 布隆过滤器获取--按需设置--针对缓存穿透
+        if (bloomFilterExist){
+            String bloomFilterKey = "bloomFilterKey";
+            // 判断布隆过滤器是否存在
+            Object bloomFilterValue = elementMap.get(bloomFilterKey);
+            // map会重启消失，所以map应该由热数据去维护
+            if (EmptyUtil.isEmpty(bloomFilterValue)){
+                // 如果是空初始化
+                RBloomFilter<String> bloomFilter = redisson.getBloomFilter(bloomFilterKey);
+                //初始化布隆过滤器：预计元素为100000000L,误差率为3%,根据这两个参数会计算出底层的bit数组大小
+                bloomFilter.tryInit(100000L,0.03);
+                // 把数据添加到bloomFilter
+                bloomFilter.add(key);
+                // 把bloomFilter塞入map
+                elementMap.put(bloomFilterKey, "bloomFilterKey");
+            }
+            // 如果不是空--开始布隆过滤器逻辑
+            RBloomFilter<String> bloomFilter = redisson.getBloomFilter(bloomFilterKey);
+            boolean elementExist = bloomFilter.contains(key);
+            if (!elementExist){
+                // 如果元素不存在-直接返回
+                return null;
+            }
+            // 如果元素存在布隆过滤器-继续查看redis
+        }
+        // redis获取
+        Object object = this.get(key);
+        if (EmptyUtil.isNotEmpty(object)){
+            // 避免缓存穿透
+            // 第一步如果数据是空，返回空对象并且续期
+            if (EMPTY_CACHE.equals(object)){
+                // 空数据续期
+                this.expire(key, genEmptyCacheTimeout());
+                return new Object();
+            }
+            // 如果不为空
+            // 相对热数据续期--增加随机数--避免缓存失效
+            this.expire(key, genProductCacheTimeout());
+            return object;
+        }
+        return null;
+    }
+
+    /**
+     * 续期时间
+     * @return
+     */
+    private Integer genEmptyCacheTimeout() {
+        return 60 + new Random().nextInt(30);
+    }
+
+    private Integer genProductCacheTimeout() {
+        return PRODUCT_CACHE_TIMEOUT + new Random().nextInt(5) * 60 * 60;
     }
 
 }
