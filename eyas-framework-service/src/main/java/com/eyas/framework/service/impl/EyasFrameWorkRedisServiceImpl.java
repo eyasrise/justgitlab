@@ -114,39 +114,35 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             lockFlag = this.redisService.redissonTryLock(elementKey, waitTime, timeUnit);
         }
         try {
-            if (lockFlag){
-                log.info(Thread.currentThread().getName() + "线程--->加锁成功！");
-                // 继续查询一下缓存
-                object = this.redisService.getElementFromCache(element);
-                if (null != object){
-                    // 如果不是空返回
-                    return object;
-                }
-                // 加读锁--为了提高性能
-                RLock rLock = this.redisService.redissonReadLock(elementReadWriteKey);
-                try {
-                    // 查询数据库--调用父类方法
+            log.info(Thread.currentThread().getName() + "线程--->加锁成功！");
+            // 继续查询一下缓存
+            object = this.redisService.getElementFromCache(element);
+            if (null != object){
+                // 如果不是空返回
+                return object;
+            }
+            // 加读锁--为了提高性能
+            RLock rLock = this.redisService.redissonReadLock(elementReadWriteKey);
+            try {
+                // 查询数据库--调用父类方法
 //                object = super.getInfoById(Long.valueOf(elementKeyId));
-                    // 模拟设置
-                    object = "1212212";
-                    log.info(Thread.currentThread().getName() + "线程--->打到数据库了！！！");
-                    if (EmptyUtil.isNotEmpty(object)) {
-                        // 缓存redis
-                        this.redisService.set(element, object);
-                        // 缓存本地map
-                        this.redisService.getElementMap().put(element, object);
-                    }else{
-                        // 防止缓存穿透--缓存空数据
-                        this.redisService.expire(element, this.redisService.genEmptyCacheTimeout());
-                    }
-                }catch (Exception e){
-                    throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "获取商品失败!");
-                }finally {
-                    log.info(Thread.currentThread().getName() + "线程--->读写锁释放锁");
-                    this.redisService.redissonReadWriteUnLock(rLock);
+                // 模拟设置
+                object = "1212212";
+                log.info(Thread.currentThread().getName() + "线程--->打到数据库了！！！");
+                if (EmptyUtil.isNotEmpty(object)) {
+                    // 缓存redis
+                    this.redisService.set(element, object);
+                    // 缓存本地map
+                    this.redisService.getElementMap().put(element, object);
+                }else{
+                    // 防止缓存穿透--缓存空数据
+                    this.redisService.expire(element, this.redisService.genEmptyCacheTimeout());
                 }
-            }else{
-                log.info(Thread.currentThread().getName() + "线程--->获取锁失败，释放锁资源！");
+            }catch (Exception e){
+                throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "获取商品失败!");
+            }finally {
+                log.info(Thread.currentThread().getName() + "线程--->读写锁释放锁");
+                this.redisService.redissonReadWriteUnLock(rLock);
             }
         }catch(Exception e){
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
