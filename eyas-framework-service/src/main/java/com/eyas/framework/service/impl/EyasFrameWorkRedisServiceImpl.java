@@ -69,7 +69,8 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * ③redis--如果查询的数据为空。缓存短暂的空数据
      * 2、DCL双重检查锁机制-防止缓存穿透
      * 分布式锁，在缓存没有数据的时候，只允许一个线程进来读数据库，其他的等待(这边需要注意一下失效时间问题)
-     * 第二个线程进来就不会继续落到数据库了，失效时间控制的合理，会统一释放用户。
+     * 1、第二个线程进来就不会继续落到数据库了，失效时间控制的合理，会统一释放用户。
+     * 2、失效时间根据业务需要调整，会导致部分线程获取不到锁的情况
      * 不然会等待(总有一个线程持有一把锁，有性能消耗)
      * 3、增加读写锁
      * ①更新数据的时候使用写锁
@@ -102,37 +103,37 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
         try {
             if (lockFlag){
                 log.info(Thread.currentThread().getName() + "线程--->加锁成功！");
+                // 继续查询一下缓存
+                object = this.redisService.getElementFromCache(element);
+                if (null != object){
+                    // 如果不是空返回
+                    return object;
+                }
+                // 加读锁--为了提高性能
+                RLock rLock = this.redisService.redissonReadLock(elementReadWriteKey);
+                try {
+                    // 查询数据库--调用父类方法
+//                object = super.getInfoById(Long.valueOf(elementKeyId));
+                    // 模拟设置
+                    object = "1212212";
+                    log.info(Thread.currentThread().getName() + "线程--->打到数据库了！！！");
+                    if (EmptyUtil.isNotEmpty(object)) {
+                        // 缓存redis
+                        this.redisService.set(element, object);
+                        // 缓存本地map
+                        this.redisService.getElementMap().put(element, object);
+                    }else{
+                        // 防止缓存穿透--缓存空数据
+                        this.redisService.expire(element, this.redisService.genEmptyCacheTimeout());
+                    }
+                }catch (Exception e){
+                    throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "获取商品失败!");
+                }finally {
+                    log.info(Thread.currentThread().getName() + "线程--->释放锁");
+                    this.redisService.redissonReadWriteUnLock(rLock);
+                }
             }else{
                 log.info(Thread.currentThread().getName() + "线程--->获取锁失败，自旋等待！");
-            }
-            // 继续查询一下缓存
-            object = this.redisService.getElementFromCache(element);
-            if (null != object){
-                // 如果不是空返回
-                return object;
-            }
-            // 加读锁--为了提高性能
-            RLock rLock = this.redisService.redissonReadLock(elementReadWriteKey);
-            try {
-                // 查询数据库--调用父类方法
-//                object = super.getInfoById(Long.valueOf(elementKeyId));
-                // 模拟设置
-                object = "1212212";
-                log.info(Thread.currentThread().getName() + "线程--->打到数据库了！！！");
-                if (EmptyUtil.isNotEmpty(object)) {
-                    // 缓存redis
-                    this.redisService.set(element, object);
-                    // 缓存本地map
-                    this.redisService.getElementMap().put(element, object);
-                }else{
-                    // 防止缓存穿透--缓存空数据
-                    this.redisService.expire(element, this.redisService.genEmptyCacheTimeout());
-                }
-            }catch (Exception e){
-                throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "获取商品失败!");
-            }finally {
-                log.info(Thread.currentThread().getName() + "线程--->释放锁");
-                this.redisService.redissonReadWriteUnLock(rLock);
             }
         }catch(Exception e){
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
