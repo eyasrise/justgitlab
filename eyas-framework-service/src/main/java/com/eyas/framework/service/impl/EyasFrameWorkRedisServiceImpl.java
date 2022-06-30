@@ -99,7 +99,12 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
         log.info(Thread.currentThread().getName() + "线程--->没有获取数据了！");
         // DCL-双重检查锁--防止缓存失效
         // 这个时间需要根据情况设置-可以为空，默认30s
-        boolean lockFlag = this.redisService.redissonTryLock(elementKey, waitTime, timeUnit);
+        boolean lockFlag = false;
+        while (!lockFlag){
+            // 自旋
+            log.info(Thread.currentThread().getName() + "线程--->没有获取到锁了！");
+            lockFlag = this.redisService.redissonTryLock(elementKey, waitTime, timeUnit);
+        }
         try {
             if (lockFlag){
                 log.info(Thread.currentThread().getName() + "线程--->加锁成功！");
