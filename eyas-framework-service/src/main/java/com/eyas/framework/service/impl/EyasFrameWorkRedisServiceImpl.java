@@ -83,8 +83,12 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * @return Object
      *
      * 测试结果:
-     * v1-2022-06-24
+     * v1-2021-03-24
      * 并发10个，效果达到，但是有部分线程未能获取到数据(可能跟DCL加锁有关系)，存在bug
+     * v2-2022-05-24
+     * tryLock需要自己调控一下是否需要再次获得锁的逻辑。可以充分利用一下线程的资源
+     * lock把线程调度交给cpu，都可以，是否需要增加一个lock后续考虑
+     * 并发100个，达到效果
      */
     @Override
     public Object getRedisElement(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
