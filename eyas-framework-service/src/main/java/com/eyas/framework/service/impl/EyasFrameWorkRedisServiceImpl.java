@@ -133,7 +133,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
                     this.redisService.redissonReadWriteUnLock(rLock);
                 }
             }else{
-                log.info(Thread.currentThread().getName() + "线程--->获取锁失败，自旋等待！");
+                log.info(Thread.currentThread().getName() + "线程--->获取锁失败，释放锁资源！");
             }
         }catch(Exception e){
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
