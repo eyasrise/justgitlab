@@ -89,6 +89,9 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * tryLock需要自己调控一下是否需要再次获得锁的逻辑。可以充分利用一下线程的资源
      * lock把线程调度交给cpu，都可以，是否需要增加一个lock后续考虑
      * 并发100个，达到效果
+     * v3-2022-06-2
+     * 优化tryLock自旋逻辑，尝试二次获取数据
+     * 使用信号量放一部分线程尝试去拿一下数据。拿不到就再自旋，拿到了就返回
      */
     @Override
     public Object getRedisElement(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
@@ -107,6 +110,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
         while (!lockFlag){
             // 自旋
             log.info(Thread.currentThread().getName() + "线程--->没有获取到锁了！");
+            // 可以尝试放指定容量的线程去再次获取数据，使用信号量?
             lockFlag = this.redisService.redissonTryLock(elementKey, waitTime, timeUnit);
         }
         try {
@@ -138,7 +142,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
                 }catch (Exception e){
                     throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "获取商品失败!");
                 }finally {
-                    log.info(Thread.currentThread().getName() + "线程--->释放锁");
+                    log.info(Thread.currentThread().getName() + "线程--->读写锁释放锁");
                     this.redisService.redissonReadWriteUnLock(rLock);
                 }
             }else{
@@ -147,6 +151,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
         }catch(Exception e){
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
         }finally {
+            log.info(Thread.currentThread().getName() + "线程--->自旋锁释放锁");
             this.redisService.redissonUnLock(elementKey);
         }
         return object;
