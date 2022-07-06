@@ -14,5 +14,10 @@ public class SystemConstant {
 
     public static final Long JWT_TTL = 3600_000L*24;
 
+    /**
+     * cpu核心数
+     */
+    public final static int PROCESSORS = Runtime.getRuntime().availableProcessors();
+
 
 }

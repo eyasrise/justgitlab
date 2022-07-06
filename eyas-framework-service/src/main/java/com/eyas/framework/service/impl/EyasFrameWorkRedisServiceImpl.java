@@ -1,6 +1,7 @@
 package com.eyas.framework.service.impl;
 
 import com.eyas.framework.EmptyUtil;
+import com.eyas.framework.constant.SystemConstant;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import com.eyas.framework.intf.RedisService;
@@ -16,11 +17,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameWorkRedisService<Dto,D,Q> {
 
-
-    /**
-     * cpu核心数
-     */
-    private final static int processors = Runtime.getRuntime().availableProcessors();
 
     private final RedisService redisService;
 
@@ -129,7 +125,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
                 log.info(Thread.currentThread().getName() + "线程--->没有获取到锁了！");
                 count++;
                 // 自旋锁-cpu核心次数
-                if (count >= processors) {
+                if (count >= SystemConstant.PROCESSORS) {
                     log.info(Thread.currentThread().getName() + "线程--->超过了核心数，拒绝！");
                     break;
                 }
@@ -147,6 +143,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
         }
         try {
             log.info(Thread.currentThread().getName() + "线程--->加锁成功！");
+            log.info(Thread.currentThread().getName() + "线程--->加锁成功！" + "自旋数量:" + count);
             // 继续查询一下缓存
             object = this.redisService.getElementFromCache(element);
             if (null != object){
