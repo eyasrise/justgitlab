@@ -123,16 +123,17 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
         boolean lockFlag = false;
         int count = 0;
         while (!lockFlag){
-            // 自旋
-            log.info(Thread.currentThread().getName() + "线程--->没有获取到锁了！");
-            count ++;
-            // 重试一定次数--再次获取一下，还获取不到就break--
-            if (count >= processors){
-                log.info(Thread.currentThread().getName() + "线程--->超过了核心数，拒绝！");
-                break;
-            }
-            // 自旋锁
             lockFlag = this.redisService.redissonTryLock(elementKey, waitTime, timeUnit);
+            // 自旋
+            if (!lockFlag) {
+                log.info(Thread.currentThread().getName() + "线程--->没有获取到锁了！");
+                count++;
+                // 自旋锁-cpu核心次数
+                if (count >= processors) {
+                    log.info(Thread.currentThread().getName() + "线程--->超过了核心数，拒绝！");
+                    break;
+                }
+            }
         }
         if (!lockFlag){
             // 自旋一定的次数如果还未获取到锁，那么我就释放锁，返回空对象
