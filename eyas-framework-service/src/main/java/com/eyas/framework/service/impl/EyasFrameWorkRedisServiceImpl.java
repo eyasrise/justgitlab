@@ -16,7 +16,14 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameWorkRedisService<Dto,D,Q> {
 
+
+    /**
+     * cpu核心数
+     */
+    private final static int processors = Runtime.getRuntime().availableProcessors();
+
     private final RedisService redisService;
+
 
     public EyasFrameWorkRedisServiceImpl(EyasFrameworkMiddle<D, Q> eyasFrameworkMiddle,
                                          RedisService redisService) {
@@ -92,6 +99,10 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * v3-2022-06-2
      * 优化tryLock自旋逻辑，尝试二次获取数据
      * 使用信号量放一部分线程尝试去拿一下数据。拿不到就再自旋，拿到了就返回
+     * v4-2022-07-06
+     * juc包无法实现分布式场景，目前设置了自旋次数超过核心数强制out来做处理
+     * 后续版本可以增加类似阻塞队列非占线程的方式来处理自旋逻辑。
+     * 比如可以使用redis的队列，把请求丢进队列，然后释放的时候从队列里面brPop
      */
     @Override
     public Object getRedisElement(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
@@ -107,11 +118,28 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
         // DCL-双重检查锁--防止缓存失效
         // 这个时间需要根据情况设置-可以为空，默认30s
         boolean lockFlag = false;
+        int count = 0;
         while (!lockFlag){
             // 自旋
             log.info(Thread.currentThread().getName() + "线程--->没有获取到锁了！");
-            // 可以尝试放指定容量的线程去再次获取数据，使用信号量?
+            count ++;
+            // 重试一定次数--再次获取一下，还获取不到就break--
+            if (count >= processors){
+                log.info(Thread.currentThread().getName() + "线程--->超过了核心数，拒绝！");
+                break;
+            }
+            // 自旋锁
             lockFlag = this.redisService.redissonTryLock(elementKey, waitTime, timeUnit);
+        }
+        if (!lockFlag){
+            // 自旋一定的次数如果还未获取到锁，那么我就释放锁，返回空对象
+            // 防止自旋异常，增加一次获取锁尝试
+            lockFlag = this.redisService.redissonTryLock(elementKey, waitTime, timeUnit);
+            // 依然失败就返回结束
+            if (!lockFlag) {
+                log.info(Thread.currentThread().getName() + "线程--->获取锁失败！");
+                return new Object();
+            }
         }
         try {
             log.info(Thread.currentThread().getName() + "线程--->加锁成功！");
