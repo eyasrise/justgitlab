@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Created by yixuan on 2019/6/20.
  */
-@Service
+//@Service
 public class RedisServiceImpl implements RedisService {
 
     public static final Integer PRODUCT_CACHE_TIMEOUT = 24;

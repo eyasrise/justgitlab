@@ -5,6 +5,7 @@ import com.eyas.framework.EmptyUtil;
 import com.eyas.framework.JwtUtils;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
+import com.eyas.framework.impl.RedisUtils;
 import com.eyas.framework.intf.RedisService;
 import com.eyas.framework.service.intf.LoginUserInformationService;
 import io.jsonwebtoken.Claims;
@@ -19,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 public class LoginUserInformationServiceImpl implements LoginUserInformationService {
 
     @Autowired
-    private RedisService redisService;
+    private RedisUtils redisUtils;
 
 
     @Override
@@ -37,6 +38,6 @@ public class LoginUserInformationServiceImpl implements LoginUserInformationServ
         }
         // 获取用户id
         String userId = claims.getId();
-        return redisService.get(userId);
+        return redisUtils.getStr(userId);
     }
 }

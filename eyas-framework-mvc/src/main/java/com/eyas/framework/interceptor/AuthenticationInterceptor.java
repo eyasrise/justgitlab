@@ -8,6 +8,7 @@ import com.eyas.framework.data.EyasFrameworkTokenInfo;
 import com.eyas.framework.data.EyasFrameworkUserInfo;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
+import com.eyas.framework.impl.RedisUtils;
 import com.eyas.framework.intf.RedisService;
 import com.eyas.framework.provider.RedisUserProvider;
 import com.eyas.framework.provider.UserProvider;
@@ -38,7 +39,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean(RedisService.class)
+    @ConditionalOnBean(RedisUtils.class)
     public UserProvider userProvider(RedisService redisService) {
         return new RedisUserProvider(redisService);
     }

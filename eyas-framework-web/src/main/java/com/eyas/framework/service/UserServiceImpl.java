@@ -18,4 +18,8 @@ public class UserServiceImpl extends EyasFrameworkAbstractService<UserEntity, Us
         this.queryByDifferentConditions(userEntityQuery);
         this.batchUpdate(userEntityList,100);
     }
+
+    public static void main(String[] args) {
+        System.out.println("CPU cores: " + "测试键盘");
+    }
 }

@@ -6,6 +6,7 @@ import com.eyas.framework.config.UseTask;
 import com.eyas.framework.data.EyasFrameworkResult;
 import com.eyas.framework.entity.UserEntity;
 import com.eyas.framework.entity.UserEntityQuery;
+import com.eyas.framework.impl.RedisUtils;
 import com.eyas.framework.intf.RedisService;
 import com.eyas.framework.service.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -25,7 +27,7 @@ import java.util.List;
 public class OkController {
 
     @Autowired
-    private RedisService redisService;
+    private RedisUtils redisService;
 
     @Autowired
     private UseTask useTask;
@@ -72,7 +74,7 @@ public class OkController {
     @GetMapping("/redisLockTest/{delay}")
     public void redisLockTest(@PathVariable String delay){
         for (int i = 0; i < 10; i++) {
-            this.redisService.tryLock(i+"", 2* 1000L, 3* 1000L);
+            this.redisService.redissonTryLock(i+"", 2* 1000L, TimeUnit.MILLISECONDS);
             useTask.aa(i, Long.valueOf(delay));
             try {
                 Thread.currentThread().sleep(Long.valueOf(delay));
@@ -85,8 +87,8 @@ public class OkController {
     @GetMapping("/testRedis")
     @WithOutToken
     public void testRedis(){
-        this.redisService.set("eyas", "eyas-framework");
-        Object object = this.redisService.get("eyas");
+        this.redisService.setStr("eyas", "eyas-framework");
+        Object object = this.redisService.getStr("eyas");
         log.info(GsonUtil.objectToJson(object));
     }
 

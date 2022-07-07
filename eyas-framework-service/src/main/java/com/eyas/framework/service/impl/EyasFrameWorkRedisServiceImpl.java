@@ -1,9 +1,11 @@
 package com.eyas.framework.service.impl;
 
 import com.eyas.framework.EmptyUtil;
+import com.eyas.framework.GsonUtil;
 import com.eyas.framework.constant.SystemConstant;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
+import com.eyas.framework.impl.RedisUtils;
 import com.eyas.framework.intf.RedisService;
 import com.eyas.framework.middle.EyasFrameworkMiddle;
 import com.eyas.framework.service.intf.EyasFrameWorkRedisService;
@@ -18,13 +20,13 @@ import java.util.concurrent.TimeUnit;
 public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameWorkRedisService<Dto,D,Q> {
 
 
-    private final RedisService redisService;
+    private final RedisUtils redisService;
 
 
     public EyasFrameWorkRedisServiceImpl(EyasFrameworkMiddle<D, Q> eyasFrameworkMiddle,
-                                         RedisService redisService) {
+                                         RedisUtils redisUtils) {
         super(eyasFrameworkMiddle);
-        this.redisService = redisService;
+        this.redisService = redisUtils;
     }
 
     @Override
@@ -35,7 +37,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             if (EmptyUtil.isEmpty(time)) {
                 time = redisService.getElementCacheTimeout();
             }
-            this.redisService.set(key, time);
+            this.redisService.setStr(key, GsonUtil.objectToJson(dto), time);
         }
         return insert;
     }
@@ -47,7 +49,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             // 新增数据--防止双写不一致
             Integer update = super.updateByLock(dto, id);
             // 更新缓存
-            this.redisService.set(key, time);
+            this.redisService.setStr(key, GsonUtil.objectToJson(dto), time);
             this.redisService.getElementMap().put(key, dto);
         } catch (Exception e) {
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.UPDATE_DATA_FAIL, "热点数据更新有误!");
@@ -148,6 +150,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             object = this.redisService.getElementFromCache(element);
             if (null != object){
                 // 如果不是空返回
+                log.info(Thread.currentThread().getName() + "线程--->获取数据成功！");
                 return object;
             }
             // 加读锁--为了提高性能
@@ -160,12 +163,12 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
                 log.info(Thread.currentThread().getName() + "线程--->打到数据库了！！！");
                 if (EmptyUtil.isNotEmpty(object)) {
                     // 缓存redis
-                    this.redisService.set(element, object);
+                    this.redisService.setStr(element, GsonUtil.objectToJson(object));
                     // 缓存本地map
                     this.redisService.getElementMap().put(element, object);
                 }else{
                     // 防止缓存穿透--缓存空数据
-                    this.redisService.expire(element, this.redisService.genEmptyCacheTimeout());
+                    this.redisService.setStr(element, this.redisService.getStr(element), this.redisService.genEmptyCacheTimeout());
                 }
             }catch (Exception e){
                 throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "获取商品失败!");

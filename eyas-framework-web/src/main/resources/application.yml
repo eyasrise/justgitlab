@@ -6,7 +6,33 @@ spring:
     url: jdbc:mysql://118.25.60.227/master?useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT%2B8
     username: root
     password: 123
-
+#  shardingsphere:
+#    datasource:
+#      names: m1
+#      m1:
+#        type: com.zaxxer.hikari.HikariDataSource
+#        driver-class-name: com.mysql.cj.jdbc.Driver
+#        url: jdbc:mysql://localhost:3306/coursedb?useUnicode=true&characterEncoding=UTF8&serverTimezone=GMT%2B8
+#        username: root
+#        password: 123
+#    sharding:
+#      course:
+#        actual-data-nodes: m1.course_$->{1..2}
+#      tables:
+#        course:
+#          key-generator:
+#            column=cid: cid
+#            type: SNOWFLAKE
+#          table-strategy:
+#            inline:
+#              sharding-column: cid
+#            standard:
+#              precise-algorithm-class-name: inline.algorithm-expression=course_$->{cid%2+1}
+#    props:
+#      sql:
+#        show: true
+#  main:
+#    allow-bean-definition-overriding: true
 
   rabbitmq:
     host: 118.25.60.227
@@ -25,30 +51,28 @@ spring:
 
   redis:
     database: 0
-    host: 129.28.186.196
-    port: 8803
     password: eyasAdmin
     jedis:
-      pool:
-        max-active: 8
-        max-wait: -1ms
-        max-idle: 8
-        min-idle: 0
-    timeout: 200ms
-#    password: eyasAdmin
-#    database: 0
-#    timeout: 3000
-#    sentinel:    #哨兵模式
-#      master: mymaster #主服务器所在集群名称
-#      nodes: 192.168.65.60:26379,192.168.65.60:26380,192.168.65.60:26381
-#    cluster:    #集群模式
-#      nodes: 192.168.50.61:8001,192.168.50.62:8002,192.168.50.63:8003,192.168.50.61:8004,192.168.50.62:8005,192.168.50.63:8006
-#    lettuce:
-#      pool:
-#        max-idle: 50
-#        min-idle: 10
-#        max-active: 100
-#        max-wait: 1000
+      max-idle: 32
+      min-idle: 16
+      max-active: 16
+      max-wait: 3000
+      conn-timeout: 3000
+      so-timeout: 3000
+      size: 20
+    timeout: 3000
+    mode:
+      single
+    single:
+      address: 129.28.186.196:8803
+    cluster:    #集群模式
+      nodes: 192.168.50.61:8001,192.168.50.62:8002,192.168.50.63:8003,192.168.50.61:8004,192.168.50.62:8005,192.168.50.63:8006
+    sentinel:    #哨兵模式
+      master: mymaster #主服务器所在集群名称
+      nodes: 192.168.65.60:26379,192.168.65.60:26380,192.168.65.60:26381
+      master-onlyWrite: true
+      fail-max: 3
+
 
   application:
     name: eyas-framework
@@ -71,3 +95,6 @@ xxl:
       logretentiondays: -1
       logconfig:
     accessToken:
+
+zk:
+  url: 106.13.58.134:2181

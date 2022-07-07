@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.redisson.config.Config;
 
-@Configuration
+//@Configuration
 public class RedissonConfig {
 
     @Value("${spring.redis.clusters}")
