@@ -213,4 +213,15 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
         return this.insert(dto);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer updateByLock(Dto dto, Long id){
+        D d = this.eyasFrameworkMiddle.getInfoById(id);
+        if (EmptyUtil.isNotEmpty(d)){
+            BeanUtils.copyProperties(dto, d);
+        }
+        return this.eyasFrameworkMiddle.updateNoLock(d);
+    }
+
+
 }

@@ -60,6 +60,12 @@
             <artifactId>mybatis</artifactId>
             <version>3.4.6</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.eyas</groupId>
+            <artifactId>eyas-framework-redis</artifactId>
+            <version>0.0.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>

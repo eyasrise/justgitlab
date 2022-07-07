@@ -139,4 +139,13 @@ public interface EyasFrameworkService<Dto, Q> {
      * @return dto
      */
     Dto getInfoById(Dto dto);
+
+    /**
+     * 乐观锁更新
+     *
+     * @param dto
+     * @param id
+     * @return
+     */
+    Integer updateByLock(Dto dto, Long id);
 }
