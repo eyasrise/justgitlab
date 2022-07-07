@@ -28,8 +28,6 @@ public class RedissonServiceImpl {
      */
     public static final Integer PRODUCT_CACHE_LEASE_TIME = 60000;
 
-
-
     @Autowired
     private RedissonClient redissonClient;
 
