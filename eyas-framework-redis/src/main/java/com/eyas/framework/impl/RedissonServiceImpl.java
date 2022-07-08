@@ -120,6 +120,7 @@ public class RedissonServiceImpl implements RedissonService {
      * @param waitTime 线程等待拿锁时间
      * @return 拿锁结果
      */
+    @Override
     public boolean redissonTryLock(String key, long waitTime, TimeUnit timeUnit){
         RLock hotCacheLock = redissonClient.getLock(key);
         try {
@@ -145,6 +146,7 @@ public class RedissonServiceImpl implements RedissonService {
         }
     }
 
+    @Override
     public void redissonUnLock(String key){
         RLock hotCacheLock = redissonClient.getLock(key);
         hotCacheLock.unlock();

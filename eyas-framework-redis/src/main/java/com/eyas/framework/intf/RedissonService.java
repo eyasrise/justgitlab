@@ -30,4 +30,8 @@ public interface RedissonService {
      * @param timeUnit 时间单位
      */
     void setStrTime(RedisKeyEnumInterface redisKeyEnumInterface, String value, Long timeToLive, TimeUnit timeUnit);
+
+    boolean redissonTryLock(String key, long waitTime, TimeUnit timeUnit);
+
+    void redissonUnLock(String key);
 }
