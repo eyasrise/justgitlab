@@ -2,9 +2,10 @@ package com.eyas.framework.impl;
 
 import com.eyas.framework.EmptyUtil;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
+import com.eyas.framework.enumeration.RedisKeyEnumInterface;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
+import com.eyas.framework.intf.RedissonService;
 import org.redisson.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class RedissonServiceImpl {
+public class RedissonServiceImpl implements RedissonService {
 
     public static final Integer PRODUCT_CACHE_TIMEOUT = 24;
 
@@ -28,8 +29,11 @@ public class RedissonServiceImpl {
      */
     public static final Integer PRODUCT_CACHE_LEASE_TIME = 60000;
 
-    @Autowired
-    private RedissonClient redissonClient;
+    private final RedissonClient redissonClient;
+
+    public RedissonServiceImpl(RedissonClient redissonClient) {
+        this.redissonClient = redissonClient;
+    }
 
     /**
      * 读取缓存中的字符串，永久有效
@@ -41,7 +45,6 @@ public class RedissonServiceImpl {
         RBucket<String> bucket = redissonClient.getBucket(key);
         return bucket.get();
     }
-
 
     /**
      * 缓存字符串
@@ -59,12 +62,39 @@ public class RedissonServiceImpl {
      *
      * @param key
      * @param value
-     * @param waitTime
+     * @param timeToLive
      * @param timeUnit
      */
-    public void setStrTime(String key, String value, Long waitTime, TimeUnit timeUnit) {
+    public void setStrTime(String key, String value, Long timeToLive, TimeUnit timeUnit) {
         RBucket<String> bucket = redissonClient.getBucket(key);
-        bucket.set(value, waitTime, timeUnit);
+        bucket.set(value, timeToLive, timeUnit);
+    }
+
+    /**
+     * 读取缓存中的字符串，永久有效
+     *
+     * @param redisKeyEnumInterface 缓存key
+     * @return 字符串
+     */
+    @Override
+    public String getStr(RedisKeyEnumInterface redisKeyEnumInterface) {
+        return this.getStr(redisKeyEnumInterface.redisKeyValue());
+    }
+
+    /**
+     * 缓存字符串
+     *
+     * @param redisKeyEnumInterface redisKey枚举
+     * @param value 缓存数据
+     */
+    @Override
+    public void setStr(RedisKeyEnumInterface redisKeyEnumInterface, String value) {
+        this.setStr(redisKeyEnumInterface.redisKeyValue(), value);
+    }
+
+    @Override
+    public void setStrTime(RedisKeyEnumInterface redisKeyEnumInterface, String value, Long timeToLive, TimeUnit timeUnit) {
+        this.setStrTime(redisKeyEnumInterface.redisKeyValue(), value, timeToLive, timeUnit);
     }
 
 
