@@ -42,13 +42,14 @@
         <nacos-discovery-spring-boot-starter.version>0.2.10</nacos-discovery-spring-boot-starter.version>
 
         <!--xxl-job-->
-        <xxl-job-core.version>2.3.1</xxl-job-core.version>
+        <xxl-job-core.version>2.0.2</xxl-job-core.version>
 
         <!--mvc-->
         <tomcat-embed-core.version>10.0.2</tomcat-embed-core.version>
-        <swagger2.version>3.0.0</swagger2.version>
+        <swagger2.version>2.2.2</swagger2.version>
         <swagger-annotations.version>1.6.6</swagger-annotations.version>
         <spring-boot-starter-amqp.version>2.7.0</spring-boot-starter-amqp.version>
+        <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
 
         <!--rpc-->
         <spring-context.tx.version>5.3.20</spring-context.tx.version>
