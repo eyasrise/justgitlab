@@ -71,6 +71,12 @@
             <version>0.0.3-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.eyas</groupId>
+            <artifactId>eyas-framework-config</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
 </project>

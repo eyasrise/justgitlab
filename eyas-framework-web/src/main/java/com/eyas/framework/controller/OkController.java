@@ -1,10 +1,12 @@
 package com.eyas.framework.controller;
 
+import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.A;
 import com.eyas.framework.annotation.WithOutToken;
 import com.eyas.framework.config.UseTask;
 import com.eyas.framework.data.EyasFrameworkResult;
 import com.eyas.framework.entity.UserEntityQuery;
 import com.eyas.framework.intf.RedisService;
+import com.eyas.framework.service.intf.EyasFrameworkConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,6 +24,9 @@ public class OkController {
     @Autowired
     private UseTask useTask;
 
+    @Autowired
+    private EyasFrameworkConfigService eyasFrameworkConfigService;
+
 
 
     @GetMapping("/ok")
@@ -30,10 +35,11 @@ public class OkController {
         return "ok111111!";
     }
 
-//    @GetMapping("config/{key}")
-//    public String config(@PathVariable String key){
-//        return this.eyasFrameworkConfigService.getAreaConfigValue(key);
-//    }
+    @GetMapping("config/{key}")
+    @WithOutToken
+    public String config(@PathVariable String key){
+        return this.eyasFrameworkConfigService.getAreaConfigValue(key);
+    }
 
 
     @GetMapping("/testPage")
