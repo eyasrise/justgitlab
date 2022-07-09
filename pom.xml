@@ -33,7 +33,8 @@
         <mysql-connector.version>8.0.23</mysql-connector.version>
         <!--lombok版本-->
         <lombok.version>1.18.24</lombok.version>
-        <mybatis-spring-boot-starter.version>2.0.0</mybatis-spring-boot-starter.version>
+        <!--mybatis-spring-boot-starter版本号-->
+        <mybatis.version>2.0.0</mybatis.version>
         <!--切面版本号-->
         <aspectjrt.version>1.9.9.1</aspectjrt.version>
 
@@ -63,7 +64,7 @@
         <!--redis-springboot-redisson-->
         <springboot.redisson.version>3.13.6</springboot.redisson.version>
         <!--mybatis版本-->
-        <mybatis.version>3.5.10</mybatis.version>
+        <org.mybatis.version>3.5.10</org.mybatis.version>
 
         <!--utils-->
         <!--jasypt-->
