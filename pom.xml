@@ -33,6 +33,7 @@
         <mysql-connector.version>8.0.23</mysql-connector.version>
         <!--lombok版本-->
         <lombok.version>1.18.24</lombok.version>
+        <mybatis-spring-boot-starter.version>2.0.0</mybatis-spring-boot-starter.version>
         <!--切面版本号-->
         <aspectjrt.version>1.9.9.1</aspectjrt.version>
 

@@ -39,7 +39,13 @@
 
         <dependency>
             <groupId>com.eyas</groupId>
-            <artifactId>eyas-framework-dependencies</artifactId>
+            <artifactId>eyas-framework-common</artifactId>
+            <version>${eyas-framework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.eyas</groupId>
+            <artifactId>eyas-framework-util</artifactId>
             <version>${eyas-framework.version}</version>
         </dependency>
     </dependencies>
