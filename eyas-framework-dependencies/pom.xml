@@ -11,21 +11,6 @@
 
     <artifactId>eyas-framework-dependencies</artifactId>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-        <eyas-framework.version>0.0.2-SNAPSHOT</eyas-framework.version>
-        <!--springboot版本统一维护-->
-        <spring-boot.version>2.1.3.RELEASE</spring-boot.version>
-        <!--mysql-connect版本-->
-        <mysql-connector.version>8.0.23</mysql-connector.version>
-        <!--mybatis版本-->
-        <mybatis.version>2.0.0</mybatis.version>
-        <!--lombok版本-->
-        <lombok.version>1.18.8</lombok.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.eyas</groupId>
