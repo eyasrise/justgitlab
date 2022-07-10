@@ -21,9 +21,4 @@ public class FrameworkApplication {
         SpringApplication.run(FrameworkApplication.class, args);
     }
 
-    @Bean
-    public void setProductName() {
-        System.setProperty("project.name", "eyas-framework");
-    }
-
 }
