@@ -3,7 +3,7 @@ spring:
     nacos:
       config:
         server-addr: 148.70.251.214:8848
-        namespace: 984ff3e6-ad33-44b5-aae2-f811738d2a4a #测试环境
+        namespace: 984ff3e6-ad33-44b5-aae2-f811738d2a4a #线上配置
         shared-configs[0]:
           data-id: nacos-config-common.properties
           refresh: true

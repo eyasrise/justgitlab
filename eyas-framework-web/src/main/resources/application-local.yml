@@ -38,7 +38,7 @@ spring:
     nacos:
       discovery:
         server-addr: 148.70.251.214:8848
-        namespace: c9e1dfdb-a25e-4f80-83ea-1306eb2ebd53
+        namespace: c9e1dfdb-a25e-4f80-83ea-1306eb2ebd53 #测试环境配置
 
 
 xxl:
