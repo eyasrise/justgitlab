@@ -31,6 +31,7 @@ public class EyasFrameworkConfigServiceImpl implements EyasFrameworkConfigServic
 
     private String getEnvNacosConfigValue(String key){
         try {
+            EmptyUtil.dealEmptyDataReturn(key, "获取nacos-configKey为空!");
             return environment.getProperty(key);
         }catch (Exception e) {
             log.error(ErrorFrameworkCodeEnum.NACOS_CONFIG_ERROR.getErrMsg(), e);
