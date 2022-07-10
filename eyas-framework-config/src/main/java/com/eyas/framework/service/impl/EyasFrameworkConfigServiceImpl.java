@@ -29,9 +29,7 @@ public class EyasFrameworkConfigServiceImpl implements EyasFrameworkConfigServic
         return this.getEnvNacosConfigValue(nacosConfigKeyConstraint.nacosKeyValue());
     }
 
-
-    @Override
-    public String getEnvNacosConfigValue(String key){
+    private String getEnvNacosConfigValue(String key){
         try {
             return environment.getProperty(key);
         }catch (Exception e) {

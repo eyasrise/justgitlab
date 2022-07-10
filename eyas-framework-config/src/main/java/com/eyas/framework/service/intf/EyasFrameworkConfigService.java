@@ -8,6 +8,4 @@ import com.eyas.framework.config.NacosConfigKeyConstraint;
 public interface EyasFrameworkConfigService {
 
     String getEnvNacosConfigValue(NacosConfigKeyConstraint nacosConfigKeyConstraint);
-
-    String getEnvNacosConfigValue(String key);
 }
