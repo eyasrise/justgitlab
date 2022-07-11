@@ -31,6 +31,8 @@ public interface RedissonService {
      */
     void setStrTime(RedisKeyEnumConstraintInterface redisKeyEnumInterface, String value, Long timeToLive, TimeUnit timeUnit);
 
+    void putLocalCache(String mapKey, Object mapValue);
+
     boolean redissonTryLock(String key, long waitTime, TimeUnit timeUnit);
 
     void redissonUnLock(String key);

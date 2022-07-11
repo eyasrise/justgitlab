@@ -105,6 +105,15 @@ public class RedissonServiceImpl implements RedissonService {
         return elementMap;
     }
 
+    @Override
+    public void putLocalCache(String mapKey, Object mapValue){
+        // 获取本地map
+        Integer size = this.getElementMap().size();
+        if (size < 32){
+            this.getElementMap().put(mapKey, mapValue);
+        }
+    }
+
     public void setElementMap(Map<String, Object> elementMap) {
         this.elementMap = elementMap;
     }
@@ -176,7 +185,7 @@ public class RedissonServiceImpl implements RedissonService {
                 // 把数据添加到bloomFilter
                 bloomFilter.add(key);
                 // 把bloomFilter塞入map
-                elementMap.put(bloomFilterKey, "bloomFilterKey");
+                this.putLocalCache(bloomFilterKey, "bloomFilterKey");
             }
             // 如果不是空--开始布隆过滤器逻辑
             RBloomFilter<String> bloomFilter = redissonClient.getBloomFilter(bloomFilterKey);

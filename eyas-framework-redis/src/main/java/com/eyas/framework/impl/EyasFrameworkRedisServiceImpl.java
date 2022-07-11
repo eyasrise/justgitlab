@@ -49,7 +49,7 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             Integer update = super.updateByLock(dto, id);
             // 更新缓存
             this.redisService.setStrTime(key, GsonUtil.objectToJson(dto), time, TimeUnit.MILLISECONDS);
-            this.redisService.getElementMap().put(key, dto);
+            this.redisService.putLocalCache(key, dto);
         } catch (Exception e) {
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.UPDATE_DATA_FAIL, "热点数据更新有误!");
         } finally {
@@ -156,15 +156,15 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             RLock rLock = this.redisService.redissonReadLock(elementReadWriteKey);
             try {
                 // 查询数据库--调用父类方法
-//                object = super.getInfoById(Long.valueOf(elementKeyId));
+                object = super.getInfoById(Long.valueOf(elementKeyId));
                 // 模拟设置
-                object = "1212212";
+//                object = "1212212";
                 log.info(Thread.currentThread().getName() + "线程--->打到数据库了！！！");
                 if (EmptyUtil.isNotEmpty(object)) {
                     // 缓存redis
                     this.redisService.setStr(element, GsonUtil.objectToJson(object));
                     // 缓存本地map
-                    this.redisService.getElementMap().put(element, object);
+                    this.redisService.putLocalCache(element, object);
                 }else{
                     // 防止缓存穿透--缓存空数据
                     this.redisService.setStrTime(element, this.redisService.getStr(element), this.redisService.genEmptyCacheTimeout().longValue(), timeUnit);
