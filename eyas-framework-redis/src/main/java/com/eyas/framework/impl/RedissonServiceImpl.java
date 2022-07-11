@@ -2,7 +2,7 @@ package com.eyas.framework.impl;
 
 import com.eyas.framework.EmptyUtil;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
-import com.eyas.framework.enumeration.RedisKeyEnumInterface;
+import com.eyas.framework.constraint.RedisKeyEnumConstraintInterface;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import com.eyas.framework.intf.RedissonService;
 import org.redisson.api.*;
@@ -77,8 +77,8 @@ public class RedissonServiceImpl implements RedissonService {
      * @return 字符串
      */
     @Override
-    public String getStr(RedisKeyEnumInterface redisKeyEnumInterface) {
-        return this.getStr(redisKeyEnumInterface.redisKeyValue());
+    public String getStr(RedisKeyEnumConstraintInterface redisKeyEnumInterface) {
+        return this.getStr(redisKeyEnumInterface.redisKeyValue().toString());
     }
 
     /**
@@ -88,13 +88,13 @@ public class RedissonServiceImpl implements RedissonService {
      * @param value 缓存数据
      */
     @Override
-    public void setStr(RedisKeyEnumInterface redisKeyEnumInterface, String value) {
-        this.setStr(redisKeyEnumInterface.redisKeyValue(), value);
+    public void setStr(RedisKeyEnumConstraintInterface redisKeyEnumInterface, String value) {
+        this.setStr(redisKeyEnumInterface.redisKeyValue().toString(), value);
     }
 
     @Override
-    public void setStrTime(RedisKeyEnumInterface redisKeyEnumInterface, String value, Long timeToLive, TimeUnit timeUnit) {
-        this.setStrTime(redisKeyEnumInterface.redisKeyValue(), value, timeToLive, timeUnit);
+    public void setStrTime(RedisKeyEnumConstraintInterface redisKeyEnumInterface, String value, Long timeToLive, TimeUnit timeUnit) {
+        this.setStrTime(redisKeyEnumInterface.redisKeyValue().toString(), value, timeToLive, timeUnit);
     }
 
 

@@ -1,6 +1,11 @@
 package com.eyas.framework.controller;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.eyas.framework.annotation.WithOutToken;
+import com.eyas.framework.config.CommonBlockHandler;
+import com.eyas.framework.config.CommonFallback;
+import com.eyas.framework.config.R;
 import com.eyas.framework.config.UseTask;
 import com.eyas.framework.data.EyasFrameworkResult;
 import com.eyas.framework.entity.UserEntityQuery;
@@ -26,6 +31,12 @@ public class OkController {
 
     @GetMapping("/ok")
     @WithOutToken
+    @SentinelResource(value = "sayHello",
+            blockHandlerClass = CommonBlockHandler.class,
+            blockHandler = "handleException1",
+            fallbackClass = CommonFallback.class,
+            fallback = "fallback1"
+            )
     public String ok(){
         return "ok111111!";
     }
@@ -57,6 +68,20 @@ public class OkController {
                 e.printStackTrace();
             }
         }
+    }
+
+    public R handleException2(@PathVariable("id") Integer id, BlockException exception){
+        return R.error(-1,"===被限流降级啦===");
+    }
+    public R fallback(@PathVariable("id") Integer id,Throwable e){
+        return R.error(-1,"===被熔断降级啦==="+e.getMessage());
+    }
+
+    public R handleException1(BlockException exception){
+        return R.error(-1,"===被限流降级啦===");
+    }
+    public R fallback1(Throwable e){
+        return R.error(-1,"===被熔断降级啦==="+e.getMessage());
     }
 
 }

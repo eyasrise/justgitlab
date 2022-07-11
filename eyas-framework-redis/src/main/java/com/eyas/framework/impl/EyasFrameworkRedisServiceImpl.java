@@ -1,14 +1,13 @@
-package com.eyas.framework.service.impl;
+package com.eyas.framework.impl;
 
 import com.eyas.framework.EmptyUtil;
 import com.eyas.framework.GsonUtil;
 import com.eyas.framework.constant.SystemConstant;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
-import com.eyas.framework.impl.RedissonServiceImpl;
-import com.eyas.framework.intf.RedisService;
+import com.eyas.framework.intf.EyasFrameworkRedisService;
 import com.eyas.framework.middle.EyasFrameworkMiddle;
-import com.eyas.framework.service.intf.EyasFrameWorkRedisService;
+import com.eyas.framework.service.impl.EyasFrameworkServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.springframework.stereotype.Service;
@@ -17,20 +16,20 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
-public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameWorkRedisService<Dto,D,Q> {
+public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkRedisService<Dto,D,Q> {
 
 
     private final RedissonServiceImpl redisService;
 
 
-    public EyasFrameWorkRedisServiceImpl(EyasFrameworkMiddle<D, Q> eyasFrameworkMiddle,
+    public EyasFrameworkRedisServiceImpl(EyasFrameworkMiddle<D, Q> eyasFrameworkMiddle,
                                          RedissonServiceImpl redisService) {
         super(eyasFrameworkMiddle);
         this.redisService = redisService;
     }
 
     @Override
-    public Integer create(Dto dto, String key, long time) {
+    public Integer createRedisElement(Dto dto, String key, long time) {
         Integer insert = super.insert(dto);
         if (1 == insert) {
             // 缓存
@@ -43,7 +42,7 @@ public class EyasFrameWorkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
     }
 
     @Override
-    public Integer update(Dto dto, String key, long time, Long id) {
+    public Integer updateRedisElement(Dto dto, String key, long time, Long id) {
         RLock rLock = redisService.redissonWriteLock(key);
         try {
             // 新增数据--防止双写不一致

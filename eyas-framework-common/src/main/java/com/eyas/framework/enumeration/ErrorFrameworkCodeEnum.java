@@ -51,6 +51,11 @@ public enum ErrorFrameworkCodeEnum {
      * 角色过期
      */
     USER_ROLE_EXPIRE_ERROR(ErrorCodeUtil.getErrorCode(SystemConstant.DOMAIN, ErrorCodeTypeEnum.BIZ.getCode(), ErrorCodeSourceEnum.INTERNAL.getCode(), "000009"), "用户角色已过期，请联系管理员"),
+
+    /**
+     * redis值获取异常
+     */
+    REDIS_VALUE_GET_ERROR(ErrorCodeUtil.getErrorCode(SystemConstant.DOMAIN, ErrorCodeTypeEnum.BIZ.getCode(), ErrorCodeSourceEnum.INTERNAL.getCode(), "000010"), "redis值获取异常"),
     ;
 
     /**

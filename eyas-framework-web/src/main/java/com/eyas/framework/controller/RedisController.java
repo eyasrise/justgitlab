@@ -1,7 +1,7 @@
 package com.eyas.framework.controller;
 
 import com.eyas.framework.annotation.WithOutToken;
-import com.eyas.framework.service.intf.EyasFrameWorkRedisService;
+import com.eyas.framework.intf.EyasFrameworkRedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +17,7 @@ public class RedisController {
 
 
     @Autowired
-    private EyasFrameWorkRedisService eyasFrameWorkRedisService;
+    private EyasFrameworkRedisService eyasFrameWorkRedisService;
 
 
     @GetMapping("/bulong")
