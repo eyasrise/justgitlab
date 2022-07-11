@@ -103,6 +103,8 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * juc包无法实现分布式场景，目前设置了自旋次数超过核心数强制out来做处理
      * 后续版本可以增加类似阻塞队列非占线程的方式来处理自旋逻辑。
      * 比如可以使用redis的队列，把请求丢进队列，然后释放的时候从队列里面brPop
+     * v5-2022-07-11
+     * 优化本地的map缓存--设置阈值长度32.超过的忽略
      */
     @Override
     public Object getRedisElement(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
