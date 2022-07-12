@@ -123,7 +123,13 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
     @Override
     public Integer updateById(Dto dto){
         D d = this.dtoToD(dto);
-        D d1 = this.eyasFrameworkMiddle.getInfoById(d);
+        // 强转类型
+        EyasFrameworkDo eyasFrameworkDo = (EyasFrameworkDo) d;
+        if (EmptyUtil.isEmpty(eyasFrameworkDo)){
+            return null;
+        }
+        Long id = eyasFrameworkDo.getId();
+        D d1 = this.eyasFrameworkMiddle.getInfoById(id);
         BeanUtils.copyProperties(dto, d1);
         return this.eyasFrameworkMiddle.update(d1);
     }
@@ -199,19 +205,9 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Integer batchDelete(Dto dto){
+    public Integer updateNoLock(Dto dto){
         D d = this.dtoToD(dto);
-        return this.eyasFrameworkMiddle.batchDelete(d);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public Integer updateByDelete(Dto dto){
-        D d = this.dtoToD(dto);
-        // 先执行删除
-        this.eyasFrameworkMiddle.delete(d);
-        // 再执行新增
-        return this.insert(dto);
+        return this.eyasFrameworkMiddle.updateNoLock(d);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -226,29 +222,11 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Integer updateNoLock(Dto dto){
-        D d = this.dtoToD(dto);
-        return this.eyasFrameworkMiddle.updateNoLock(d);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    @Override
     public Integer updateByLock(Q q){
         return this.updateByLock(q, 10);
     }
 
-    /**
-     * 动态条件更新数据
-     * 逻辑:
-     * 1、先根据条件查询出数据
-     * 2、然后将数据拆分-粒度可以调整(默认10)
-     * 3、拆分以后获取拆分后的id，然后根据批量id去更新数据
-     *
-     * @param q
-     * @return
-     */
     @Transactional(rollbackFor = Exception.class)
-    @Override
     public Integer updateByLock(Q q, Integer dynamicExpansionLength){
         List<D> dList = this.eyasFrameworkMiddle.queryByDifferentConditions(q);
         AtomicReference<Integer> count = new AtomicReference<>(0);
@@ -277,5 +255,22 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
         return count.get();
     }
 
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer batchDelete(Dto dto){
+        D d = this.dtoToD(dto);
+        return this.eyasFrameworkMiddle.batchDelete(d);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer updateByDelete(Dto dto){
+        D d = this.dtoToD(dto);
+        // 先执行删除
+        this.eyasFrameworkMiddle.delete(d);
+        // 再执行新增
+        return this.insert(dto);
+    }
 
 }

@@ -153,9 +153,16 @@ public interface EyasFrameworkService<Dto, Q> {
     @Transactional(rollbackFor = Exception.class)
     Integer updateNoLock(Dto dto);
 
+    /**
+     * 动态条件更新数据
+     * 逻辑:
+     * 1、先根据条件查询出数据
+     * 2、然后将数据拆分-粒度可以调整(默认10)
+     * 3、拆分以后获取拆分后的id，然后根据批量id去更新数据
+     *
+     * @param q 批量更新的入参
+     * @return 批量更新结果
+     */
     @Transactional(rollbackFor = Exception.class)
     Integer updateByLock(Q q);
-
-    @Transactional(rollbackFor = Exception.class)
-    Integer updateByLock(Q q, Integer dynamicExpansionLength);
 }
