@@ -1,6 +1,7 @@
 package com.eyas.framework.service.intf;
 
 import com.eyas.framework.data.EyasFrameworkBaseQuery;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -148,4 +149,13 @@ public interface EyasFrameworkService<Dto, Q> {
      * @return
      */
     Integer updateByLock(Dto dto, Long id);
+
+    @Transactional(rollbackFor = Exception.class)
+    Integer updateNoLock(Dto dto);
+
+    @Transactional(rollbackFor = Exception.class)
+    Integer updateByLock(Q q);
+
+    @Transactional(rollbackFor = Exception.class)
+    Integer updateByLock(Q q, Integer dynamicExpansionLength);
 }

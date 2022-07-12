@@ -88,4 +88,38 @@ public class ListUtil {
         return null;
     }
 
+    /**
+     * 数组长度动态切割算法
+     * 默认数组长度小于粒度*10或者；粒度*10 < 1000--默认最多一个数组放100个
+     * 超过粒度的10倍走动态切割，就是步长固定，为了预防数组长度过大，数组过多的问题。
+     *
+     * @param tList 切割list
+     * @param specialLength 粒度
+     * @param <T> 切割数据返回多list集合
+     * @return List<List<T>> 切割以后的数据
+     * v3-2022-07-12
+     * 扩展因子固定为10
+     */
+    public static <T> List<List<T>> getListLengthDynamicExpansion(List<T> tList, int specialLength){
+        // 为了简化逻辑默认的动态扩展粒度就给10
+        if (EmptyUtil.isEmpty(specialLength) || specialLength != 10){
+            specialLength = 10;
+        }
+        int size = tList.size();
+        // 超过粒度specialSize的10倍走动态扩展，小于走固定扩展
+        if (size < specialLength * 10){
+            return ListUtil.splitList(tList, specialLength);
+        }
+        int high = size / specialLength;
+        if (high < size / 10){
+            high = size / 10;
+        }
+        List<List<T>> lists = new ArrayList<>();
+        if (high == 0){
+            lists.add(tList);
+            return lists;
+        }
+        return ListUtil.splitList(tList, high);
+    }
+
 }

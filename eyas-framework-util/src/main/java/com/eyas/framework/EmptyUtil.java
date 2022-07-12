@@ -119,6 +119,7 @@ public class EmptyUtil {
      * @param <T> 泛型
      * @return Boolean
      */
+    @Deprecated
     public static <T> Boolean dealListForceEmpty(List<T> tList){
         if (EmptyUtil.isNotEmpty(tList) && EmptyUtil.isNotEmpty(tList.get(0))){
             return false;
@@ -137,6 +138,35 @@ public class EmptyUtil {
      */
     public static <T> List<T> dealListForceEmptyDataReturn(List<T> tList, String errMsg){
         if (EmptyUtil.dealListForceEmpty(tList)){
+            throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.NULL_PARAM_ERROR, errMsg);
+        }
+        return tList;
+    }
+
+    /**
+     * 对集合进行强制判断空，这个方法一旦校验，集合必定有值.
+     *
+     * @param tList 集合
+     * @param <T> 泛型
+     * @return Boolean
+     */
+    public static <T> Boolean dealListForceEmpty2(List<T> tList){
+        if (EmptyUtil.isNotEmpty(tList) && tList.size()>0){
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    /**
+     * 对集合进行强制判断空，这个方法一旦校验，集合必定有值.
+     *
+     * @param tList 集合
+     * @param <T> 泛型
+     * @return Boolean
+     */
+    public static <T> List<T> dealListForceEmpty2(List<T> tList, String errMsg){
+        if (EmptyUtil.dealListForceEmpty2(tList)){
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.NULL_PARAM_ERROR, errMsg);
         }
         return tList;

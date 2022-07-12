@@ -4,13 +4,13 @@ import com.eyas.framework.EmptyUtil;
 import com.eyas.framework.ListUtil;
 import com.eyas.framework.StringUtil;
 import com.eyas.framework.data.EyasFrameworkBaseQuery;
+import com.eyas.framework.data.EyasFrameworkDo;
 import com.eyas.framework.data.EyasFrameworkQuery;
 import com.eyas.framework.enumeration.ErrorFrameworkCodeEnum;
 import com.eyas.framework.exception.EyasFrameworkRuntimeException;
 import com.eyas.framework.middle.EyasFrameworkMiddle;
 import com.eyas.framework.service.intf.EyasFrameworkService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +18,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Created by yixuan on 2019/1/17.
@@ -221,6 +222,61 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
             BeanUtils.copyProperties(dto, d);
         }
         return this.eyasFrameworkMiddle.updateNoLock(d);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer updateNoLock(Dto dto){
+        D d = this.dtoToD(dto);
+        return this.eyasFrameworkMiddle.updateNoLock(d);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer updateByLock(Q q){
+        return this.updateByLock(q, 10);
+    }
+
+    /**
+     * 动态条件更新数据
+     * 逻辑:
+     * 1、先根据条件查询出数据
+     * 2、然后将数据拆分-粒度可以调整(默认10)
+     * 3、拆分以后获取拆分后的id，然后根据批量id去更新数据
+     *
+     * @param q
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Integer updateByLock(Q q, Integer dynamicExpansionLength){
+        List<D> dList = this.eyasFrameworkMiddle.queryByDifferentConditions(q);
+        AtomicReference<Integer> count = new AtomicReference<>(0);
+        if (!EmptyUtil.dealListForceEmpty2(dList)){
+            // 涉及到批量更新--设置粒度为10
+            // 获取list长度
+            int size = dList.size();
+            // 数组长度动态扩展
+            if (EmptyUtil.isEmpty(dynamicExpansionLength)){
+                dynamicExpansionLength = 10;
+            }
+            List<List<D>> lists = ListUtil.getListLengthDynamicExpansion(dList, dynamicExpansionLength);
+            lists.stream().forEach(dList1 -> {
+                // 强转数据类型--获取批量的id
+                List<Long> idList = new ArrayList<>();
+                dList1.stream().forEach(d -> {
+                    EyasFrameworkDo eyasFrameworkDo = (EyasFrameworkDo) d;
+                    idList.add(eyasFrameworkDo.getId());
+                });
+                EyasFrameworkDo eyasFrameworkDo = new EyasFrameworkDo();
+                BeanUtils.copyProperties(q, eyasFrameworkDo);
+                eyasFrameworkDo.setIdList(idList);
+                // 转数据
+                D d = (D) eyasFrameworkDo;
+                count.set(count.get() + this.eyasFrameworkMiddle.batchUpdate(d));
+            });
+        }
+        return count.get();
     }
 
 

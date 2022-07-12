@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Created by yixuan on 2019/6/20.
@@ -91,5 +92,11 @@ public class EyasFrameworkDo implements Serializable {
      */
     @ApiModelProperty(value = "租户编码code")
     private Long tenantCode;
+
+
+    /**
+     * 批量操作数据
+     */
+    private List<Long> idList;
 
 }
