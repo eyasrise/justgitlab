@@ -253,11 +253,9 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
         List<D> dList = this.eyasFrameworkMiddle.queryByDifferentConditions(q);
         AtomicReference<Integer> count = new AtomicReference<>(0);
         if (!EmptyUtil.dealListForceEmpty2(dList)){
-            // 涉及到批量更新--设置粒度为10
-            // 获取list长度
-            int size = dList.size();
             // 数组长度动态扩展
             if (EmptyUtil.isEmpty(dynamicExpansionLength)){
+                // 涉及到批量更新--设置粒度为10
                 dynamicExpansionLength = 10;
             }
             List<List<D>> lists = ListUtil.getListLengthDynamicExpansion(dList, dynamicExpansionLength);
