@@ -90,19 +90,17 @@ public class ListUtil {
 
     /**
      * 数组长度动态切割算法
-     * 默认数组长度小于粒度*10或者；粒度*10 < 1000--默认最多一个数组放100个
-     * 超过粒度的10倍走动态切割，就是步长固定，为了预防数组长度过大，数组过多的问题。
+     * 切割树的高度为数组长度/数组长度开根号
      *
      * @param tList 切割list
      * @param <T> 切割数据返回多list集合
      * @return List<List<T>> 切割以后的数据
-     * v3-2022-07-12
+     * v1-2022-07-12
      * 扩展因子固定为10
+     * v2-2022-07-12
+     * 修改扩展因子为数组长度开根号
      */
     public static <T> List<List<T>> getListLengthDynamicExpansion(List<T> tList){
-
-        // 粒度判断-粒度不应该超过整体长度粒度的一半，比如1000的长度你的粒度最好不能超过100
-        // 粒度开根号处理
         int size = tList.size();
         double sqrtDouble = Math.sqrt(size);
         int sqrtInt = (int) sqrtDouble;
@@ -114,7 +112,7 @@ public class ListUtil {
     public static void main(String[] args) {
 
         List<Integer> aa = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 55; i++) {
             aa.add(i);
         }
         double bb = Math.sqrt(aa.size());
