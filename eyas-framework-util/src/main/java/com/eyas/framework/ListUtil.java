@@ -94,32 +94,35 @@ public class ListUtil {
      * 超过粒度的10倍走动态切割，就是步长固定，为了预防数组长度过大，数组过多的问题。
      *
      * @param tList 切割list
-     * @param specialLength 粒度
      * @param <T> 切割数据返回多list集合
      * @return List<List<T>> 切割以后的数据
      * v3-2022-07-12
      * 扩展因子固定为10
      */
-    public static <T> List<List<T>> getListLengthDynamicExpansion(List<T> tList, int specialLength){
-        // 为了简化逻辑默认的动态扩展粒度就给10
-        if (EmptyUtil.isEmpty(specialLength) || specialLength != 10){
-            specialLength = 10;
-        }
+    public static <T> List<List<T>> getListLengthDynamicExpansion(List<T> tList){
+
+        // 粒度判断-粒度不应该超过整体长度粒度的一半，比如1000的长度你的粒度最好不能超过100
+        // 粒度开根号处理
         int size = tList.size();
-        // 超过粒度specialSize的10倍走动态扩展，小于走固定扩展
-        if (size < specialLength * 10){
-            return ListUtil.splitList(tList, specialLength);
+        double sqrtDouble = Math.sqrt(size);
+        int sqrtInt = (int) sqrtDouble;
+        int specialLength = size/sqrtInt;
+        return ListUtil.splitList(tList, specialLength);
+    }
+
+
+    public static void main(String[] args) {
+
+        List<Integer> aa = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            aa.add(i);
         }
-        int high = size / specialLength;
-        if (high < size / 10){
-            high = size / 10;
+        double bb = Math.sqrt(aa.size());
+        int ss = (int) bb;
+        List<List<Integer>> aallist =  ListUtil.getListLengthDynamicExpansion(aa);
+        for (int i = 0; i < aallist.size(); i++) {
+            System.out.println(i + "----->" + aallist.get(i));
         }
-        List<List<T>> lists = new ArrayList<>();
-        if (high == 0){
-            lists.add(tList);
-            return lists;
-        }
-        return ListUtil.splitList(tList, high);
     }
 
 }
