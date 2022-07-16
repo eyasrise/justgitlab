@@ -221,13 +221,7 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
     }
 
     @Transactional(rollbackFor = Exception.class)
-    @Override
     public Integer updateByLock(Q q){
-        return this.updateByLock(q, 10);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public Integer updateByLock(Q q, Integer dynamicExpansionLength){
         List<D> dList = this.eyasFrameworkMiddle.queryByDifferentConditions(q);
         AtomicReference<Integer> count = new AtomicReference<>(0);
         if (!EmptyUtil.dealListForceEmpty2(dList)){
