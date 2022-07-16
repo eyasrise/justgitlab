@@ -231,6 +231,7 @@ public class EyasFrameworkServiceImpl<Dto,D,Q> implements EyasFrameworkService<D
         List<D> dList = this.eyasFrameworkMiddle.queryByDifferentConditions(q);
         AtomicReference<Integer> count = new AtomicReference<>(0);
         if (!EmptyUtil.dealListForceEmpty2(dList)){
+            // 动态切割数组
             List<List<D>> lists = ListUtil.getListLengthDynamicExpansion(dList);
             lists.stream().forEach(dList1 -> {
                 // 强转数据类型--获取批量的id

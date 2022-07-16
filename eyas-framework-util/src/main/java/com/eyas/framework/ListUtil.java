@@ -105,22 +105,6 @@ public class ListUtil {
         double sqrtDouble = Math.sqrt(size);
         int sqrtInt = (int) sqrtDouble;
         int specialLength = size/sqrtInt;
-        return ListUtil.splitList(tList, specialLength);
+        return ListUtil.splitList(tList, specialLength, true);
     }
-
-
-    public static void main(String[] args) {
-
-        List<Integer> aa = new ArrayList<>();
-        for (int i = 0; i < 55; i++) {
-            aa.add(i);
-        }
-        double bb = Math.sqrt(aa.size());
-        int ss = (int) bb;
-        List<List<Integer>> aallist =  ListUtil.getListLengthDynamicExpansion(aa);
-        for (int i = 0; i < aallist.size(); i++) {
-            System.out.println(i + "----->" + aallist.get(i));
-        }
-    }
-
 }
