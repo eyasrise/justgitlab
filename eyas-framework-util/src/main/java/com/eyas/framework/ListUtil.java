@@ -3,6 +3,7 @@ package com.eyas.framework;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -101,11 +102,31 @@ public class ListUtil {
      * 修改扩展因子为数组长度开根号
      */
     public static <T> List<List<T>> getListLengthDynamicExpansion(List<T> tList){
-        tList.removeIf(Objects::isNull);
+        Iterator<T> it = tList.iterator();
+        while (it.hasNext()) {
+            if (it.next() == null) {
+                it.remove();
+            }
+        }
         int size = tList.size();
         double sqrtDouble = Math.sqrt(size);
         int sqrtInt = (int) sqrtDouble;
         int specialLength = size/sqrtInt;
         return ListUtil.splitList(tList, specialLength);
+    }
+
+    public static void main(String[] args) {
+        List<Integer> aa = new ArrayList<>();
+        for (int i = 0; i < 100000; i++) {
+            if (i / 100 == 0){
+                aa.add(null);
+            }else {
+                aa.add(i);
+            }
+        }
+        Long startTime = System.currentTimeMillis();
+        List<List<Integer>> bb = ListUtil.getListLengthDynamicExpansion(aa);
+        Long endTime = System.currentTimeMillis();
+        System.out.println("时间:" + (endTime - startTime));
     }
 }
