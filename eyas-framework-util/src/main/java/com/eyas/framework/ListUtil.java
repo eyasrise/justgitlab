@@ -101,10 +101,11 @@ public class ListUtil {
      * 修改扩展因子为数组长度开根号
      */
     public static <T> List<List<T>> getListLengthDynamicExpansion(List<T> tList){
+        tList.removeIf(Objects::isNull);
         int size = tList.size();
         double sqrtDouble = Math.sqrt(size);
         int sqrtInt = (int) sqrtDouble;
         int specialLength = size/sqrtInt;
-        return ListUtil.splitList(tList, specialLength, true);
+        return ListUtil.splitList(tList, specialLength);
     }
 }
