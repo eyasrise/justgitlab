@@ -2,6 +2,9 @@ package com.eyas.framework.enums;
 
 import com.eyas.framework.config.NacosConfigKeyConstraint;
 
+/**
+ * @author eyas
+ */
 public enum EyasFrameworkNacosKeyEnum implements NacosConfigKeyConstraint {
 
     // common域
