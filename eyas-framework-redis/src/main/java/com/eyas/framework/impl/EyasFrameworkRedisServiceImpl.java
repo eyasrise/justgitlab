@@ -108,6 +108,7 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * 比如可以使用redis的队列，把请求丢进队列，然后释放的时候从队列里面brPop
      * v5-2022-07-11
      * 优化本地的map缓存--设置阈值长度32.超过的忽略
+     * v6-2022-08-09-增加本地缓存技术-caffeineCache-用来优化本地一级缓存
      */
     @Override
     public Object getRedisElement(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
@@ -161,9 +162,9 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             RLock rLock = this.redisService.redissonReadLock(elementReadWriteKey);
             try {
                 // 查询数据库--调用父类方法
-                object = super.getInfoById(Long.valueOf(elementKeyId));
+//                object = super.getInfoById(Long.valueOf(elementKeyId));
                 // 模拟设置
-//                object = "1212212";
+                object = "1212212";
                 log.info(Thread.currentThread().getName() + "线程--->打到数据库了！！！");
                 if (EmptyUtil.isNotEmpty(object)) {
                     // 缓存redis
