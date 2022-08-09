@@ -52,7 +52,13 @@
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-service</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>${eyas-framework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.eyas</groupId>
+            <artifactId>eyas-framework-cache</artifactId>
+            <version>${eyas-framework.version}</version>
         </dependency>
     </dependencies>
 

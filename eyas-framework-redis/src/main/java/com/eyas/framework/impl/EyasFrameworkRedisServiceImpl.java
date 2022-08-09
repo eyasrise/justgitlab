@@ -21,11 +21,14 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
 
     private final RedissonServiceImpl redisService;
 
+    private final CacheUtils cacheUtils;
+
 
     public EyasFrameworkRedisServiceImpl(EyasFrameworkMiddle<D, Q> eyasFrameworkMiddle,
-                                         RedissonServiceImpl redisService) {
+                                         RedissonServiceImpl redisService, CacheUtils cacheUtils) {
         super(eyasFrameworkMiddle);
         this.redisService = redisService;
+        this.cacheUtils = cacheUtils;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             Integer update = super.updateByLock(dto, id);
             // 更新缓存
             this.redisService.setStrTime(key, GsonUtil.objectToJson(dto), time, TimeUnit.MILLISECONDS);
-            this.redisService.putLocalCache(key, dto);
+            this.cacheUtils.putAndUpdateCache(key, dto);
         } catch (Exception e) {
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.UPDATE_DATA_FAIL, "热点数据更新有误!");
         } finally {
@@ -166,7 +169,7 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
                     // 缓存redis
                     this.redisService.setStr(element, GsonUtil.objectToJson(object));
                     // 缓存本地map
-                    this.redisService.putLocalCache(element, object);
+                    this.cacheUtils.putAndUpdateCache(element, object);
                 }else{
                     // 防止缓存穿透--缓存空数据
                     this.redisService.setStrTime(element, this.redisService.getStr(element), this.redisService.genEmptyCacheTimeout().longValue(), timeUnit);

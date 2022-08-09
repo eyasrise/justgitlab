@@ -8,9 +8,7 @@ import com.eyas.framework.intf.RedissonService;
 import org.redisson.api.*;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -19,8 +17,6 @@ public class RedissonServiceImpl implements RedissonService {
     public static final Integer PRODUCT_CACHE_TIMEOUT = 24;
 
     public static final String EMPTY_CACHE = "{}";
-
-    public static Map<String, Object> elementMap = new ConcurrentHashMap<>();
 
     public static final Integer PRODUCT_LOCK_DEFAULT_WAIT_TIME = 1000;
 
@@ -31,8 +27,11 @@ public class RedissonServiceImpl implements RedissonService {
 
     private final RedissonClient redissonClient;
 
-    public RedissonServiceImpl(RedissonClient redissonClient) {
+    private final CacheUtils cacheUtils;
+
+    public RedissonServiceImpl(RedissonClient redissonClient, CacheUtils cacheUtils) {
         this.redissonClient = redissonClient;
+        this.cacheUtils = cacheUtils;
     }
 
     /**
@@ -100,24 +99,6 @@ public class RedissonServiceImpl implements RedissonService {
 
     //===============================redisson=================================
 
-
-    public Map<String, Object> getElementMap() {
-        return elementMap;
-    }
-
-    @Override
-    public void putLocalCache(String mapKey, Object mapValue){
-        // 获取本地map
-        Integer size = this.getElementMap().size();
-        if (size < 32){
-            this.getElementMap().put(mapKey, mapValue);
-        }
-    }
-
-    public void setElementMap(Map<String, Object> elementMap) {
-        this.elementMap = elementMap;
-    }
-
     /**
      * 锁等待时间如果为空，默认设置1s一次;
      * 锁等待时间不宜大于看门狗的触发时间(续期时间/3),如果锁等待时间大于看门狗的触发时间，默认修改成看门狗的触发时间/2
@@ -167,7 +148,7 @@ public class RedissonServiceImpl implements RedissonService {
 
     public Object getElementFromCache(String key, boolean bloomFilterExist){
         // 本地获取--这个map需要热数据维护
-        Object element = elementMap.get(key);
+        Object element = cacheUtils.getObjCacheByKey(key, String.class);
         if (EmptyUtil.isNotEmpty(element)){
             return element;
         }
@@ -175,7 +156,7 @@ public class RedissonServiceImpl implements RedissonService {
         if (bloomFilterExist){
             String bloomFilterKey = "bloomFilterKey";
             // 判断布隆过滤器是否存在
-            Object bloomFilterValue = elementMap.get(bloomFilterKey);
+            Object bloomFilterValue = cacheUtils.getObjCacheByKey(bloomFilterKey, String.class);
             // map会重启消失，所以map应该由热数据去维护
             if (EmptyUtil.isEmpty(bloomFilterValue)){
                 // 如果是空初始化
@@ -185,7 +166,7 @@ public class RedissonServiceImpl implements RedissonService {
                 // 把数据添加到bloomFilter
                 bloomFilter.add(key);
                 // 把bloomFilter塞入map
-                this.putLocalCache(bloomFilterKey, "bloomFilterKey");
+                this.cacheUtils.putAndUpdateCache(bloomFilterKey, "bloomFilterKey");
             }
             // 如果不是空--开始布隆过滤器逻辑
             RBloomFilter<String> bloomFilter = redissonClient.getBloomFilter(bloomFilterKey);
