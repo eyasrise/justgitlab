@@ -12,8 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class CacheUtils {
 
-    @Autowired
-    Cache<String, Object> caffeineCache;
+    public final Cache<String, Object> caffeineCache;
+
+    public CacheUtils(Cache<String, Object> caffeineCache) {
+        this.caffeineCache = caffeineCache;
+    }
 
     /**
      * 添加或更新缓存
