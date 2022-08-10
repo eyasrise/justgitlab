@@ -10,4 +10,5 @@ public interface EyasFrameworkRedisService<Dto, D, Q> {
 
     Object getRedisElement(String key, long waitTime, String elementKeyId, TimeUnit timeUnit);
 
+    Object getRedisElementLogs(String element, long waitTime, String elementKeyId, TimeUnit timeUnit);
 }

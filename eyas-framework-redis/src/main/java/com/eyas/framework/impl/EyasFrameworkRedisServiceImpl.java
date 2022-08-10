@@ -116,6 +116,75 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
         String elementReadWriteKey = element + ":readWriteKey";
         Object object = this.redisService.getElementFromCache(element);
         if (null != object){
+            // 如果不是空返回
+            return object;
+        }
+        // DCL-双重检查锁--防止缓存失效
+        // 这个时间需要根据情况设置-可以为空，默认30s
+        boolean lockFlag = false;
+        int count = 0;
+        while (!lockFlag){
+            lockFlag = this.redisService.redissonTryLock(elementKey, waitTime, timeUnit);
+            // 自旋
+            if (!lockFlag) {
+                count++;
+                // 自旋锁-cpu核心次数
+                if (count >= SystemConstant.PROCESSORS) {
+                    break;
+                }
+            }
+        }
+        if (!lockFlag){
+            // 自旋一定的次数如果还未获取到锁，那么我就释放锁，返回空对象
+            // 防止自旋异常，增加一次获取锁尝试
+            lockFlag = this.redisService.redissonTryLock(elementKey, waitTime, timeUnit);
+            // 依然失败就返回结束
+            if (!lockFlag) {
+                return new Object();
+            }
+        }
+        try {
+            // 继续查询一下缓存
+            object = this.redisService.getElementFromCache(element);
+            if (null != object){
+                // 如果不是空返回
+                return object;
+            }
+            // 加读锁--为了提高性能
+            RLock rLock = this.redisService.redissonReadLock(elementReadWriteKey);
+            try {
+                // 查询数据库--调用父类方法
+//                object = super.getInfoById(Long.valueOf(elementKeyId));
+                // 模拟设置
+                object = "1212212";
+                if (EmptyUtil.isNotEmpty(object)) {
+                    // 缓存redis
+                    this.redisService.setStr(element, GsonUtil.objectToJson(object));
+                    // 缓存本地map
+                    this.cacheUtils.putAndUpdateCache(element, object);
+                }else{
+                    // 防止缓存穿透--缓存空数据
+                    this.redisService.setStrTime(element, this.redisService.getStr(element), this.redisService.genEmptyCacheTimeout().longValue(), timeUnit);
+                }
+            }catch (Exception e){
+                throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "获取商品失败!");
+            }finally {
+                this.redisService.redissonReadWriteUnLock(rLock);
+            }
+        }catch(Exception e){
+            throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
+        }finally {
+            this.redisService.redissonUnLock(elementKey);
+        }
+        return object;
+    }
+
+    @Override
+    public Object getRedisElementLogs(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
+        String elementKey = element + ":key";
+        String elementReadWriteKey = element + ":readWriteKey";
+        Object object = this.redisService.getElementFromCache(element);
+        if (null != object){
             log.info(Thread.currentThread().getName() + "线程--->获取到数据了！");
             // 如果不是空返回
             return object;
