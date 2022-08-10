@@ -71,9 +71,10 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * 实现逻辑
      * 1、获取缓存数据:
      * 从一层redis增加三层并且可配置
-     * ①jvm层使用ConcurrentHashMap(注意大小分配)
-     * ②布隆过滤器
-     * ③redis--如果查询的数据为空。缓存短暂的空数据
+     * --①jvm层使用ConcurrentHashMap(注意大小分配)
+     * ① 使用caffeine作为本地一级缓存
+     * ② 布隆过滤器作为二级缓存
+     * ③ redis--如果查询的数据为空。缓存短暂的空数据
      * 2、DCL双重检查锁机制-防止缓存穿透
      * 分布式锁，在缓存没有数据的时候，只允许一个线程进来读数据库，其他的等待(这边需要注意一下失效时间问题)
      * 1、第二个线程进来就不会继续落到数据库了，失效时间控制的合理，会统一释放用户。
