@@ -47,9 +47,10 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
     @Override
     public Integer updateRedisElement(Dto dto, String key, long time, Long id) {
         RLock rLock = redisService.redissonWriteLock(key);
+        Integer update;
         try {
             // 新增数据--防止双写不一致
-            Integer update = super.updateByLock(dto, id);
+            update = super.updateByLock(dto, id);
             // 更新缓存
             this.redisService.setStrTime(key, GsonUtil.objectToJson(dto), time, TimeUnit.MILLISECONDS);
             this.cacheUtils.putAndUpdateCache(key, dto);
@@ -58,7 +59,7 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
         } finally {
             this.redisService.redissonReadWriteUnLock(rLock);
         }
-        return null;
+        return update;
     }
 
     /**
