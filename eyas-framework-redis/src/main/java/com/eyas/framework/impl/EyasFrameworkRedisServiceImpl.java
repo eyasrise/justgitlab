@@ -88,11 +88,6 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * ①自旋锁会占据线程,希望通过await那种方式去释放线程，然后由释放锁的线程主动去释放阻塞线程
      * ②提高一定的并发度，可以增加redis分段锁来缓解并发压力
      *
-     * @param element 缓存key
-     * @param waitTime 缓存key失效时间，可以为空
-     * @param elementKeyId 缓存key对应的数据id-用来获取数据库数据
-     * @return Object
-     *
      * 测试结果:
      * v1-2021-03-24
      * 并发10个，效果达到，但是有部分线程未能获取到数据(可能跟DCL加锁有关系)，存在bug
@@ -110,6 +105,12 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * v5-2022-07-11
      * 优化本地的map缓存--设置阈值长度32.超过的忽略
      * v6-2022-08-09-增加本地缓存技术-caffeineCache-用来优化本地一级缓存
+     *
+     * @param element 缓存key
+     * @param waitTime 缓存key失效时间，可以为空
+     * @param elementKeyId 缓存key对应的数据id-用来获取数据库数据
+     * @return Object
+     *
      */
     @Override
     public Object getRedisElement(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
@@ -174,7 +175,7 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             }
         }catch(Exception e){
             throw new EyasFrameworkRuntimeException(ErrorFrameworkCodeEnum.SYSTEM_ERROR, "redisson tryLock fail");
-        }finally {
+        } finally {
             this.redisService.redissonUnLock(elementKey);
         }
         return object;
