@@ -188,7 +188,7 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
     }
 
     @Override
-    public Object getRedisElementLogs(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
+    public Object getRedisElementLogs(String element, Long waitTime, Long failureTime, String elementKeyId, TimeUnit timeUnit){
         String elementKey = element + ":key";
         String elementReadWriteKey = element + ":readWriteKey";
         Object object = this.redisService.getElementFromCache(element);
@@ -245,7 +245,11 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
                 log.info(Thread.currentThread().getName() + "线程--->打到数据库了！！！");
                 if (EmptyUtil.isNotEmpty(object)) {
                     // 缓存redis
-                    this.redisService.setStr(element, GsonUtil.objectToJson(object));
+                    if (EmptyUtil.isEmpty(failureTime)) {
+                        this.redisService.setStr(element, GsonUtil.objectToJson(object));
+                    }else{
+                        this.redisService.setStrTime(element, GsonUtil.objectToJson(object), failureTime, timeUnit);
+                    }
                     // 缓存本地map
                     this.cacheUtils.putAndUpdateCache(element, object);
                 }else{
