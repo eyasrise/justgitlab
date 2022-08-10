@@ -108,13 +108,14 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
      * v6-2022-08-09-增加本地缓存技术-caffeineCache-用来优化本地一级缓存
      *
      * @param element 缓存key
-     * @param waitTime 缓存key失效时间，可以为空
+     * @param waitTime 线程等锁时间(不宜超过10s)，可以为空(默认10s)
+     * @param failureTime key失效时间
      * @param elementKeyId 缓存key对应的数据id-用来获取数据库数据
      * @return Object
      *
      */
     @Override
-    public Object getRedisElement(String element, long waitTime, String elementKeyId, TimeUnit timeUnit){
+    public Object getRedisElement(String element, Long waitTime, Long failureTime, String elementKeyId, TimeUnit timeUnit){
         String elementKey = element + ":key";
         String elementReadWriteKey = element + ":readWriteKey";
         Object object = this.redisService.getElementFromCache(element);
@@ -162,7 +163,11 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
                 object = "1212212";
                 if (EmptyUtil.isNotEmpty(object)) {
                     // 缓存redis
-                    this.redisService.setStr(element, GsonUtil.objectToJson(object));
+                    if (EmptyUtil.isEmpty(failureTime)) {
+                        this.redisService.setStr(element, GsonUtil.objectToJson(object));
+                    }else{
+                        this.redisService.setStrTime(element, GsonUtil.objectToJson(object), failureTime, timeUnit);
+                    }
                     // 缓存本地map
                     this.cacheUtils.putAndUpdateCache(element, object);
                 }else{
@@ -260,5 +265,10 @@ public class EyasFrameworkRedisServiceImpl<Dto,D,Q> extends EyasFrameworkService
             this.redisService.redissonUnLock(elementKey);
         }
         return object;
+    }
+
+    @Override
+    public Object getRedisElement(String element, Long waitTime, String elementKeyId, TimeUnit timeUnit){
+        return this.getRedisElement(element, waitTime, null, elementKeyId, timeUnit);
     }
 }

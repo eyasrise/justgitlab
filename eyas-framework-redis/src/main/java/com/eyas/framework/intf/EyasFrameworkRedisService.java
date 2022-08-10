@@ -8,7 +8,9 @@ public interface EyasFrameworkRedisService<Dto, D, Q> {
 
     Integer updateRedisElement(Dto dto, String key, long time, Long id);
 
-    Object getRedisElement(String key, long waitTime, String elementKeyId, TimeUnit timeUnit);
+    Object getRedisElement(String key, Long waitTime, String elementKeyId, TimeUnit timeUnit);
+
+    Object getRedisElement(String element, Long waitTime, Long failureTime, String elementKeyId, TimeUnit timeUnit);
 
     Object getRedisElementLogs(String element, long waitTime, String elementKeyId, TimeUnit timeUnit);
 }

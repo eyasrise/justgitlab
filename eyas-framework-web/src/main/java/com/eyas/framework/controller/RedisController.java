@@ -29,7 +29,7 @@ public class RedisController {
 //        log.info(GsonUtil.objectToJson(o));
         for (int i=0; i<100 ; i++) {
             new Thread(() -> {
-                Object o1 = eyasFrameWorkRedisService.getRedisElement("eyas-ceShi-0809-3", 1000, "12", TimeUnit.MILLISECONDS);
+                Object o1 = eyasFrameWorkRedisService.getRedisElement("eyas-ceShi-0809-3", 1000L, "12", TimeUnit.MILLISECONDS);
 //                log.info(Thread.currentThread().getName() + "-->" + GsonUtil.objectToJson(o1));
             }, "thread" + i).start();
 
