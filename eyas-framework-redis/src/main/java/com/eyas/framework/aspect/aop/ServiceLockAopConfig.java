@@ -46,7 +46,7 @@ public class ServiceLockAopConfig {
             log.info(logStr + "runTime--" + joinPoint + "\tUse time : " + (end - start) + " ms!");
             return result;
         } catch (Exception e) {
-            log.error("加锁失败!", e.getMessage());
+            log.error("加锁失败!:{}", e.getMessage());
             e.printStackTrace();
             return EyasFrameworkResult.ok();
         }finally {
