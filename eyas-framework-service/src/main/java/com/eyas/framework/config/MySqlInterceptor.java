@@ -36,6 +36,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * @author eyas
+ */
 @Intercepts(
         value = {
                 @Signature(
@@ -55,6 +58,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class MySqlInterceptor implements Interceptor {
 
+    @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Object result = null;
         Object target = invocation.getTarget();
@@ -238,10 +242,12 @@ public class MySqlInterceptor implements Interceptor {
         log.info("<== Total: " + count);
     }
 
+    @Override
     public Object plugin(Object o) {
         return Plugin.wrap(o, this);
     }
 
+    @Override
     public void setProperties(Properties properties) {
     }
 }
