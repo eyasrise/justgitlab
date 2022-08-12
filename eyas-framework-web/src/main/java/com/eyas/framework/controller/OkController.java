@@ -31,12 +31,6 @@ public class OkController {
 
     @GetMapping("/ok")
     @WithOutToken
-    @SentinelResource(value = "sayHello",
-            blockHandlerClass = CommonBlockHandler.class,
-            blockHandler = "handleException1",
-            fallbackClass = CommonFallback.class,
-            fallback = "fallback1"
-            )
     public String ok(){
         return "ok111111!";
     }
