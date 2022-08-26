@@ -9,3 +9,5 @@
 jwt解析token获取用户信息从单一的从redis获取，现在改成由各项目自己
 实现获取方式，默认的使用redis，重写userProvide可以自己实现获取用户
 信息功能
+####4.2022-08-26增加mybatis_plus
+架构增加mybatis_plus插件

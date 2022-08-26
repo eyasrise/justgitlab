@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.eyas</groupId>
     <artifactId>eyas-framework-web</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>eyas-framework-web</name>
     <description>Demo project for Spring Boot</description>
 
@@ -52,11 +52,11 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.0.0</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.mybatis.spring.boot</groupId>-->
+<!--            <artifactId>mybatis-spring-boot-starter</artifactId>-->
+<!--            <version>2.0.0</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>mysql</groupId>
@@ -66,37 +66,43 @@
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-service</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-job</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-mq</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-redis</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-mvc</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.eyas</groupId>
             <artifactId>eyas-framework-config</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
+            <version>0.0.4-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.eyas</groupId>
+            <artifactId>eyas-framework-mybatis-plus</artifactId>
+            <version>0.0.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>

@@ -7,22 +7,21 @@
         <artifactId>eyas-framework</artifactId>
         <version>0.0.4-SNAPSHOT</version>
     </parent>
+    <packaging>pom</packaging>
 
-    <artifactId>eyas-framework-job</artifactId>
+    <artifactId>eyas-framework-mybatis-plus</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>com.eyas</groupId>
-            <artifactId>eyas-framework-service</artifactId>
-            <version>${eyas-framework.version}</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.5.2</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.xuxueli</groupId>
-            <artifactId>xxl-job-core</artifactId>
-            <version>${xxl-job-core.version}</version>
-        </dependency>
-
+<!--        <dependency>-->
+<!--            <groupId>com.h2database</groupId>-->
+<!--            <artifactId>h2</artifactId>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
     </dependencies>
 
 </project>
